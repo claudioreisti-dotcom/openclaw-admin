@@ -41,7 +41,9 @@ IGNORE_SENDERS = [
     'noreply', 'no-reply', 'marketing', 'newsletter', 'promocao',
     'promoção', 'news', 'notify', 'notification', 'alerts@linkedin',
     'jobalerts', 'smiles', 'bitly', 'drjones', 'insiderstore',
-    'scriptcase', 'tivit'
+    'scriptcase', 'tivit', 'shopee', 'mercadolivre', 'amazon',
+    'americanas', 'magazine', 'submarino', 'aliexpress', 'shein',
+    'ifood', 'rappi', 'uber', 'nubank', 'inter', 'c6bank'
 ]
 
 def is_important(sender, subject):
