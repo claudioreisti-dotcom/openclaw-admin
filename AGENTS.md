@@ -207,6 +207,23 @@ Think of it like a human reviewing their journal and updating their mental model
 
 The goal: Be helpful without being annoying. Check in a few times a day, do useful background work, but respect quiet time.
 
+## Backup / Git
+
+Repositório: https://github.com/claudioreisti-dotcom/alfred.git (branch `main`)
+
+**Regras obrigatórias:**
+- A cada mudança relevante no workspace (novo serviço, config, memória), commitar e fazer push
+- Novos serviços → criar pasta em `infra/<serviço>/` com `docker-compose.yml` (ou config equivalente) + `README.md` de restore
+- Commitar com mensagens descritivas: `feat:`, `chore:`, `fix:`, `docs:`
+- Token GitHub salvo em TOOLS.md
+
+**O que vai para o git:**
+- Todos os arquivos do workspace (`memory/`, `infra/`, `*.md`)
+- Configs de infraestrutura
+
+**O que NÃO vai:**
+- `.openclaw/` (arquivos internos OpenClaw — no `.gitignore`)
+
 ## Make It Yours
 
 This is a starting point. Add your own conventions, style, and rules as you figure out what works.
