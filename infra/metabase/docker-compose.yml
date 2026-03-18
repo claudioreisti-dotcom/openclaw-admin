@@ -1,0 +1,14 @@
+services:
+  metabase:
+    image: metabase/metabase:latest
+    container_name: metabase
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      JAVA_OPTS: "-Xmx512m"
+    volumes:
+      - metabase-data:/metabase.db
+
+volumes:
+  metabase-data:
