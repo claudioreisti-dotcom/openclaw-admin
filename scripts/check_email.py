@@ -42,7 +42,9 @@ IGNORE_SENDERS = [
     'promoção', 'news', 'notify', 'notification', 'alerts@linkedin',
     'jobalerts', 'smiles', 'bitly', 'drjones', 'insiderstore',
     'scriptcase', 'tivit', 'shopee', 'mercadolivre', 'amazon',
-    'americanas', 'magazineluiza', 'ifood', 'rappi', 'shopee', 'mercadolivre', 'amazon',
+    'americanas', 'magazineluiza', 'ifood', 'rappi',
+    'itau.emps', 'itau.com.br', 'bradesco.com.br', 'santander.com.br',
+    'bb.com.br', 'caixa.gov.br', 'shopee', 'mercadolivre', 'amazon',
     'americanas', 'magazine', 'submarino', 'aliexpress', 'shein',
     'ifood', 'rappi', 'uber', 'nubank', 'inter', 'c6bank'
 ]
