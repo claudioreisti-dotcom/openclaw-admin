@@ -23,6 +23,12 @@ Skills define _how_ tools work. This file is for _your_ specifics — the stuff 
 - **Modo:** inbound (só responde em voz quando recebe áudio)
 - **TODO:** Integrar n8n como endpoint TTS personalizado para voz de melhor qualidade
 
+## Email - Gmail (R4 Tecnologias)
+
+- **Email:** admin@r4tecnologias.com.br (alias: claudio.reis@r4tecnologias.com.br)
+- **App Password:** lrfo pxzu bomh vnvo
+- **Protocolo:** IMAP (imap.gmail.com:993) / SMTP (smtp.gmail.com:587)
+
 ## Email - Microsoft 365
 
 - **Email:** claudio.reis@noxcare.com.br
