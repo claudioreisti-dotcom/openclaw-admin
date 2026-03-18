@@ -2,6 +2,12 @@
 
 Skills define _how_ tools work. This file is for _your_ specifics — the stuff that's unique to your setup.
 
+## Git / Backup
+
+- **Repositório:** https://github.com/claudioreisti-dotcom/alfred.git
+- **Token:** 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
+- **Branch:** main
+
 ## Banco de Dados
 
 ### Neon (PostgreSQL)
