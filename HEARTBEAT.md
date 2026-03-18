@@ -1,5 +1,12 @@
 # HEARTBEAT.md
 
-# Keep this file empty (or with only comments) to skip heartbeat API calls.
+## Verificações periódicas
 
-# Add tasks below when you want the agent to check something periodically.
+### 📬 Email
+Execute: `python3 /home/claudioreis/.openclaw/workspace/scripts/check_email.py`
+
+- Se retornar `NENHUM_IMPORTANTE` → HEARTBEAT_OK
+- Se retornar emails importantes → me alertar com o conteúdo resumido
+
+### Frequência sugerida
+- Email: a cada heartbeat (verifica apenas não lidos recentes)
