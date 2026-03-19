@@ -15,6 +15,10 @@ Produto de controle de despesas pessoais via Telegram (fase 1).
 - `recorrentes` — assinaturas e cobranças fixas
 - `parcelamentos` — compras parceladas
 
+## Telegram Bot
+- **Username:** @appeli_bot
+- **Token:** `8668345383:AAHXd2sOziSVCuuUfLuKR9K7geh4cDOLuFg`
+
 ## Roadmap
 - [x] Fase 1: uso pessoal via Telegram
 - [ ] Fase 2: WhatsApp
