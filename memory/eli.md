@@ -1,5 +1,8 @@
 # Projeto Elí — Assistente Financeiro Pessoal
 
+## Origem do nome
+Eli — homenagem à mãe de Cláudio Reis, **Elienai**.
+
 ## Visão geral
 Assistente financeiro via Telegram para controle de gastos, receitas, recorrentes e parcelados.
 Fase atual: uso pessoal de Cláudio Reis. Futuro: produto comercial.
@@ -74,3 +77,26 @@ https://github.com/claudioreisti-dotcom/eli.git
 
 ## Pendente
 - Extratos conta corrente Nubank + Itaú (Cláudio vai exportar)
+
+## Roadmap revisado (19/03/2026)
+
+### Fase 1 — Consolidação (agora)
+- [x] Bot Telegram funcionando
+- [x] Banco com histórico importado
+- [x] Recorrentes e parcelamentos cadastrados
+- [x] Categorias organizadas
+- [x] Visão competência + caixa
+- [x] eli_api.py para WhatsApp/Alfred
+- [ ] /resumo_caixa no bot Telegram
+- [ ] Alertas proativos (fatura fechando, orçamento estourando)
+- [ ] Cadastro de recorrentes/parcelamentos via chat
+- [ ] Automação importação faturas (menos manual)
+
+### Fase 2 — Dashboard
+- [ ] Metabase conectado ao banco Eli
+- [ ] Painéis: mensal, categorias, fluxo de caixa, parcelamentos
+
+### Fase 3 — PWA
+- Após 2-3 meses de dados confiáveis e fluxo estável
+
+### Fase 4 — Produto comercial / Multi-usuário
