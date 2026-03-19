@@ -16,6 +16,11 @@ Skills define _how_ tools work. This file is for _your_ specifics — the stuff 
 - **Tabelas:** `projetos`, `demandas`, `gastos`, `notas`
 - **Uso:** Sala de controle — demandas, projetos, gastos pessoais/profissionais
 
+## WhatsApp Alfred
+- **Número:** +55 11 52868645 → (11) 5286-8645
+- **Uso:** Número dedicado para Alfred atender via WhatsApp
+- **Status:** chip recebido — configuração pendente
+
 ## TTS
 
 - **Provedor atual:** Microsoft Edge TTS (gratuito, sem API key)

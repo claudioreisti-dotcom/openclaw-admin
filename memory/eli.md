@@ -54,3 +54,23 @@ https://github.com/claudioreisti-dotcom/eli.git
 - Agno avaliado mas adiado — bot atual funciona, migrar quando escalar
 - Sem ADs — monetização por assinatura R$9,90/mês + afiliados contextuais
 - WhatsApp: usar número dedicado para evitar bloqueio Meta
+
+## Scripts de importação
+- `/home/claudioreis/eli/import_nubank.py` — CSV do Nubank (automático, detecção de duplicatas)
+- `/home/claudioreis/eli/import_itau_manual.py` — Itaú NOX (manual, extraído do PDF)
+- `/home/claudioreis/eli/import_mp.py` — Mercado Pago (manual, extraído do PDF)
+- `/home/claudioreis/eli/eli_api.py` — API para Alfred usar no WhatsApp
+
+## Fluxo mensal
+1. Exportar faturas dos cartões → importar com os scripts
+2. Exportar extratos conta corrente Nubank + Itaú (pendente)
+3. Baixar recorrentes/parcelamentos pagos no mês
+
+## Importações realizadas (março/2026)
+- Nubank CR: 69 lançamentos (fev/mar)
+- Itaú NOX: 39 lançamentos (fev/mar)
+- Mercado Pago: 21 lançamentos (fev/mar)
+- Inter Black: já estava no banco (Medcof - Tati 1/12)
+
+## Pendente
+- Extratos conta corrente Nubank + Itaú (Cláudio vai exportar)

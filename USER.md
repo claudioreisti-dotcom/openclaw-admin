@@ -7,6 +7,7 @@ _Learn about the person you're helping. Update this as you go._
 - **Pronouns:** ele/him
 - **Timezone:** UTC-3 (Brasil)
 - **Notes:** Username Telegram: reisclaudio | Instagram: @claudioreis.ssa
+- **WhatsApp pessoal:** +55 71 99903-0397
 
 ## Context
 
