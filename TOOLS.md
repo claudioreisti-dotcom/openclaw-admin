@@ -36,7 +36,7 @@ Skills define _how_ tools work. This file is for _your_ specifics — the stuff 
 
 ## Email - Microsoft 365
 
-- **Email:** claudio.reis@noxcare.com.br
+- **Email:** claudio.reis@noxtec.com.br
 - **Tenant ID:** f2bc8c37-afb8-4157-a4af-dea016478e5e
 - **Client ID:** 42e0e89d-e378-47ce-83e0-c61c6e01a533
 - **Client Secret:** 5yi8Q~rG8KDC70E9u_AWZmNf_v7EawXab8dFia2Y
