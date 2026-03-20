@@ -11,6 +11,18 @@ from datetime import datetime, timezone
 import json
 import os
 
+STATE_FILE = "/home/claudioreis/.openclaw/workspace/scripts/.email_r4_state.json"
+
+def load_state():
+    if os.path.exists(STATE_FILE):
+        with open(STATE_FILE) as f:
+            return json.load(f)
+    return {"seen_uids": []}
+
+def save_state(state):
+    with open(STATE_FILE, "w") as f:
+        json.dump(state, f)
+
 def decode_str(s):
     if s is None: return ''
     parts = decode_header(s)
@@ -70,22 +82,28 @@ def is_important(sender, subject):
     
     return False, None
 
-def check_mailbox(host, email_addr, password, label):
+def check_mailbox(host, email_addr, password, label, state):
     results = []
+    seen_uids = set(state.get("seen_uids", []))
+    new_uids = []
     try:
         mail = imaplib.IMAP4_SSL(host, 993)
         mail.login(email_addr, password)
         mail.select('inbox')
         
-        # Buscar não lidos das últimas 24h
+        # Buscar não lidos
         status, data = mail.search(None, 'UNSEEN')
         if not data[0]:
             mail.logout()
-            return results
+            return results, new_uids
             
-        ids = data[0].split()[-50:]  # últimos 50 não lidos
+        ids = data[0].split()[-50:]
         
         for uid in reversed(ids):
+            uid_str = uid.decode()
+            if uid_str in seen_uids:
+                continue
+            new_uids.append(uid_str)
             try:
                 status, msg_data = mail.fetch(uid, '(BODY[HEADER.FIELDS (FROM SUBJECT DATE)])')
                 raw = msg_data[0][1]
@@ -110,18 +128,25 @@ def check_mailbox(host, email_addr, password, label):
     except Exception as e:
         results.append({'label': label, 'error': str(e)})
     
-    return results
+    return results, new_uids
 
 if __name__ == '__main__':
     all_important = []
+    state = load_state()
     
     # Gmail R4
-    all_important += check_mailbox(
+    results, new_uids = check_mailbox(
         'imap.gmail.com',
         'admin@r4tecnologias.com.br',
         'lrfo pxzu bomh vnvo',
-        'Gmail R4'
+        'Gmail R4',
+        state
     )
+    all_important += results
+    
+    # Salvar estado
+    all_seen = list(set(state.get("seen_uids", [])) | set(new_uids))
+    save_state({"seen_uids": all_seen[-500:]})
     
     if all_important:
         print(f"📬 {len(all_important)} email(s) importante(s):")

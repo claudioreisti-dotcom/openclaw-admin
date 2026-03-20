@@ -6,12 +6,24 @@ Retorna: NENHUM_IMPORTANTE ou lista de emails relevantes
 
 import requests
 import json
+import os
 from datetime import datetime, timezone, timedelta
 
 TENANT_ID = "f2bc8c37-afb8-4157-a4af-dea016478e5e"
 CLIENT_ID = "42e0e89d-e378-47ce-83e0-c61c6e01a533"
 CLIENT_SECRET = "5yi8Q~rG8KDC70E9u_AWZmNf_v7EawXab8dFia2Y"
 EMAIL = "claudio.reis@noxtec.com.br"
+STATE_FILE = "/home/claudioreis/.openclaw/workspace/scripts/.email_noxtec_state.json"
+
+def load_state():
+    if os.path.exists(STATE_FILE):
+        with open(STATE_FILE) as f:
+            return json.load(f)
+    return {"last_seen_ids": []}
+
+def save_state(state):
+    with open(STATE_FILE, "w") as f:
+        json.dump(state, f)
 
 # Remetentes/assuntos que indicam urgência
 URGENTES_REMETENTES = ['diretor', 'ceo', 'presidente', 'cto', 'gestor']
@@ -40,6 +52,8 @@ def get_token():
 def verificar():
     token = get_token()
     headers = {"Authorization": f"Bearer {token}"}
+    state = load_state()
+    seen_ids = set(state.get("last_seen_ids", []))
 
     # Buscar emails das últimas 24h (lidos e não lidos)
     desde = (datetime.now(timezone.utc) - timedelta(hours=24)).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -55,14 +69,21 @@ def verificar():
 
     msgs = r.json().get("value", [])
     importantes = []
+    novos_ids = []
 
     for m in msgs:
+        msg_id = m.get("id", "")
         assunto = m.get("subject", "").lower()
         remetente = m.get("from", {}).get("emailAddress", {})
         nome_rem = remetente.get("name", "").lower()
         addr_rem = remetente.get("address", "").lower()
         importance = m.get("importance", "normal")
         is_read = m.get("isRead", False)
+
+        # Pular emails já notificados
+        if msg_id in seen_ids:
+            continue
+        novos_ids.append(msg_id)
 
         # Ignorar newsletters/marketing
         if any(k in assunto for k in IGNORAR_ASSUNTO):
@@ -88,6 +109,10 @@ def verificar():
                 "motivo": motivo,
                 "lido": is_read
             })
+
+    # Salvar IDs notificados (manter últimos 200)
+    all_seen = list(seen_ids) + novos_ids
+    save_state({"last_seen_ids": all_seen[-200:]})
 
     if not importantes:
         print("NENHUM_IMPORTANTE")
