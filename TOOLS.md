@@ -34,9 +34,11 @@ Skills define _how_ tools work. This file is for _your_ specifics — the stuff 
 - **Provedor atual:** Microsoft Edge TTS (gratuito, sem API key)
 - **Voz configurada:** pt-BR-AntonioNeural
 - **Modo:** inbound (só responde em voz quando recebe áudio)
-- **Google Cloud TTS (a configurar):**
+- **Google Cloud TTS (ativo):**
   - API Key: AIzaSyAycAfqtqUZdc2ZDmu_a_c8mwD0bXr-lSY
-  - Voz: Chirp3-HD (pt-BR)
+  - Voz: pt-BR-Chirp3-HD-Algieba (masculina, grave)
+  - Velocidade: 1.5x
+  - Proxy: http://127.0.0.1:5050 (systemd: tts-proxy)
   - Limite gratuito: 1M caracteres/mês
 
 ## Email - Gmail (R4 Tecnologias)
