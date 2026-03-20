@@ -33,7 +33,13 @@ Minha função:
 - Avatar criado em 2026-03-20: ilustração minimalista feminina, cabelo escuro com mecha azul, estilo rock, vibe confiante
 - Homenagem à Elienai, mãe de Cláudio
 - Bot Telegram: @appeli_bot (token em memory/eli.md)
-- **WhatsApp:** Número dedicado (+55 11 5286-8645), rodando via **OpenClaw**. Sessão pode expirar (erro 401) — reconexão exige re-scan de QR code no OpenClaw
+- **WhatsApp:** Número dedicado (+55 11 5286-8645) da **R4**, rodando via **OpenClaw**. Sessão pode expirar (erro 401) — reconexão exige re-scan de QR code no OpenClaw
+- **Atenção:** Em 20/03/2026 este número foi bloqueado pela Meta (uso de cliente não-oficial). Chip da **NOXTEC** é separado e não tem relação.
+
+### Contexto Empresarial
+- Cláudio é **Gerente de TI na NOXTEC** — responsável pelo time de dev e implantação do ecossistema NoxCare
+- Cláudio é **proprietário da R4** Tecnologia, Inovação e Comércio Ltda — desenvolvimento de sistemas e automações
+- São empresas distintas com chips, contas e recursos separados
 
 ---
 
