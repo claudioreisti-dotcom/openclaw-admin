@@ -23,7 +23,7 @@ IGNORAR_ASSUNTO = ['newsletter', 'noreply', 'unsubscribe', 'promoção', 'oferta
 
 # Remetentes VIP — sempre alertar, independente de lido ou não
 VIP_NOMES = ['marcos sobral', 'marcos']
-VIP_EMAILS = []  # adicionar emails diretos se souber: ex: 'marcos.sobral@noxtec.com.br'
+VIP_EMAILS = ['sobral@noxtec.com.br']
 
 def get_token():
     r = requests.post(
