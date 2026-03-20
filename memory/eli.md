@@ -100,3 +100,9 @@ https://github.com/claudioreisti-dotcom/eli.git
 - Após 2-3 meses de dados confiáveis e fluxo estável
 
 ### Fase 4 — Produto comercial / Multi-usuário
+
+## Próxima sessão — Alertas proativos
+Implementar no Eli:
+1. Parcela/recorrente vencendo em X dias → aviso antecipado
+2. Fatura do cartão fechando em breve → lembrete
+3. Categoria com gasto acima de limite definido → alerta
