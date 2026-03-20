@@ -45,6 +45,9 @@ Minha função:
 
 ## 📅 Histórico relevante
 
-- **2026-03-18** — Primeira conversa. Nome "Alfred" definido por Cláudio.
-- **2026-03-19** — Projeto Eli criado e documentado (ver memory/eli.md)
-- **2026-03-20** — Avatar do Eli criado (Gemini/Imagen). Identidade Alfred aprofundada com referência ao Batman.
+> **Regra:** Sempre ler o diário do dia atual e do dia anterior ao iniciar uma sessão.
+> Diários em: `memory/YYYY-MM-DD.md`
+
+- **2026-03-18** → `memory/2026-03-18.md` — Primeira conversa. Nome Alfred definido. Sala de Controle criada (Neon + Metabase). 38 demandas importadas.
+- **2026-03-19** → `memory/2026-03-19.md` — Projeto Eli criado, bot Telegram, 1.496 transações importadas.
+- **2026-03-20** → `memory/2026-03-20.md` — Avatar Eli criado. Revisão completa das demandas. Melhorias no heartbeat e Metabase. WhatsApp R4 bloqueado pela Meta.
