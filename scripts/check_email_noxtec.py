@@ -21,6 +21,10 @@ URGENTES_ASSUNTO = ['urgente', 'crítico', 'critico', 'incidente', 'falha', 'for
 IGNORAR_ASSUNTO = ['newsletter', 'noreply', 'unsubscribe', 'promoção', 'oferta',
                    'mensalidade especial', 'desconto']
 
+# Remetentes VIP — sempre alertar, independente de lido ou não
+VIP_NOMES = ['marcos sobral', 'marcos']
+VIP_EMAILS = []  # adicionar emails diretos se souber: ex: 'marcos.sobral@noxtec.com.br'
+
 def get_token():
     r = requests.post(
         f"https://login.microsoftonline.com/{TENANT_ID}/oauth2/v2.0/token",
@@ -37,13 +41,13 @@ def verificar():
     token = get_token()
     headers = {"Authorization": f"Bearer {token}"}
 
-    # Buscar não lidos das últimas 4 horas
-    desde = (datetime.now(timezone.utc) - timedelta(hours=4)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    # Buscar emails das últimas 24h (lidos e não lidos)
+    desde = (datetime.now(timezone.utc) - timedelta(hours=24)).strftime("%Y-%m-%dT%H:%M:%SZ")
     url = (
         f"https://graph.microsoft.com/v1.0/users/{EMAIL}/messages"
-        f"?$filter=isRead eq false and receivedDateTime ge {desde}"
+        f"?$filter=receivedDateTime ge {desde}"
         f"&$select=subject,from,receivedDateTime,importance,isRead"
-        f"&$top=20&$orderby=receivedDateTime desc"
+        f"&$top=50&$orderby=receivedDateTime desc"
     )
     r = requests.get(url, headers=headers)
     if r.status_code != 200:
@@ -56,27 +60,33 @@ def verificar():
         assunto = m.get("subject", "").lower()
         remetente = m.get("from", {}).get("emailAddress", {})
         nome_rem = remetente.get("name", "").lower()
+        addr_rem = remetente.get("address", "").lower()
         importance = m.get("importance", "normal")
+        is_read = m.get("isRead", False)
 
         # Ignorar newsletters/marketing
         if any(k in assunto for k in IGNORAR_ASSUNTO):
             continue
 
         motivo = None
+        is_vip = any(v in nome_rem for v in VIP_NOMES) or any(v in addr_rem for v in VIP_EMAILS)
 
-        if importance == "high":
-            motivo = "marcado como importante"
-        elif any(k in assunto for k in URGENTES_ASSUNTO):
-            motivo = f"assunto relevante"
-        elif any(k in nome_rem for k in URGENTES_REMETENTES):
-            motivo = f"remetente relevante"
+        if is_vip:
+            motivo = "remetente VIP"
+        elif not is_read and importance == "high":
+            motivo = "marcado como importante (não lido)"
+        elif not is_read and any(k in assunto for k in URGENTES_ASSUNTO):
+            motivo = "assunto relevante (não lido)"
+        elif not is_read and any(k in nome_rem for k in URGENTES_REMETENTES):
+            motivo = "remetente relevante (não lido)"
 
         if motivo:
             importantes.append({
                 "de": remetente.get("name", remetente.get("address", "")),
                 "assunto": m.get("subject", ""),
                 "data": m.get("receivedDateTime", "")[:16].replace("T", " "),
-                "motivo": motivo
+                "motivo": motivo,
+                "lido": is_read
             })
 
     if not importantes:
@@ -85,7 +95,8 @@ def verificar():
 
     print(f"📬 {len(importantes)} email(s) importante(s) na NOXTEC:")
     for e in importantes:
-        print(f"  🔴 [{e['data']}]")
+        lido_str = "✅ lido" if e['lido'] else "🔵 não lido"
+        print(f"  🔴 [{e['data']}] {lido_str}")
         print(f"     De: {e['de']}")
         print(f"     Assunto: {e['assunto']}")
         print(f"     Motivo: {e['motivo']}")
