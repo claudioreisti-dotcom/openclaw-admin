@@ -8,6 +8,14 @@ Skills define _how_ tools work. This file is for _your_ specifics — the stuff 
 - **Token:** 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
 - **Branch:** main
 
+## Metabase — Sala de Controle
+
+- **URL:** http://46.225.182.16:3000
+- **Admin:** admin@r4tecnologias.com.br
+- **Senha:** 214833Oidu@lc
+- **Dashboard ID:** 2 (Sala de Controle)
+- **Database ID:** 2 (Sala de Controle — Neon PostgreSQL)
+
 ## Banco de Dados
 
 ### Neon (PostgreSQL)
