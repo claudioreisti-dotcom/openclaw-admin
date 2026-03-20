@@ -29,10 +29,11 @@ Minha função:
 ## 🧠 Projetos e Contexto
 
 ### Eli — Assistente Financeiro Pessoal
-- Ver `memory/eli.md` para detalhes completos
+- **Documentação completa:** `memory/eli.md` ← sempre consultar para detalhes do projeto
 - Avatar criado em 2026-03-20: ilustração minimalista feminina, cabelo escuro com mecha azul, estilo rock, vibe confiante
 - Homenagem à Elienai, mãe de Cláudio
-- Bot Telegram: @appeli_bot
+- Bot Telegram: @appeli_bot (token em memory/eli.md)
+- **WhatsApp:** Número dedicado (+55 11 5286-8645), rodando via **OpenClaw**. Sessão pode expirar (erro 401) — reconexão exige re-scan de QR code no OpenClaw
 
 ---
 
