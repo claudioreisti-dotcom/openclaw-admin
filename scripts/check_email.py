@@ -91,8 +91,10 @@ def check_mailbox(host, email_addr, password, label, state):
         mail.login(email_addr, password)
         mail.select('inbox')
         
-        # Buscar não lidos
-        status, data = mail.search(None, 'UNSEEN')
+        # Buscar não lidos das últimas 24h
+        from datetime import timedelta
+        since_date = (datetime.now(timezone.utc) - timedelta(days=1)).strftime('%d-%b-%Y')
+        status, data = mail.search(None, f'UNSEEN SINCE {since_date}')
         if not data[0]:
             mail.logout()
             return results, new_uids
