@@ -76,6 +76,10 @@ Você existe para:
 
 ---
 
+## 🔕 Alertas ignorados
+
+- **Flowti** — descartar todos os alertas, não notificar
+
 ## 🕐 Horário de mensagens
 
 - **Só enviar mensagens/alertas a partir das 07h00 (horário de Brasília / UTC-3)**
