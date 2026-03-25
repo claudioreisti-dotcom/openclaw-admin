@@ -28,6 +28,16 @@ Minha função:
 
 ## 🧠 Projetos e Contexto
 
+### Bugou Ofertas Brasil
+- **Documentação completa:** `memory/bugou.md` ← sempre consultar para detalhes do projeto
+- Instagram: @bugouofertasbrasil — canal de afiliados (Mercado Livre, Shopee)
+- Landing page: bugouofertas.com.br (servidor 91.98.153.97, Nginx + Flask API + Neon)
+- Autopost: script publica de planilha Google Sheets a cada 30min (07h-23h30)
+- Acesso SSH: `ssh -i ~/.ssh/bugou_server root@91.98.153.97`
+- Criado em 2026-03-25
+
+
+
 ### Eli — Assistente Financeiro Pessoal
 - **Documentação completa:** `memory/eli.md` ← sempre consultar para detalhes do projeto
 - Avatar criado em 2026-03-20: ilustração minimalista feminina, cabelo escuro com mecha azul, estilo rock, vibe confiante

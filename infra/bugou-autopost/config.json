@@ -1,0 +1,19 @@
+{
+  "meta": {
+    "app_id": "2276630942865660",
+    "app_secret": "6e8d3c9bf6990e4ead242976f08a2485",
+    "page_id": "1091845864004179",
+    "page_token": "EAAgWlXKiWPwBROEygHH18eteCTdWUhMSTE88uWq2tzNw3qeZBD5KvKuF9ZBlFZCluGiZBt2CiPXZACymaRjs6WEuGVGdfmFotuABxLFcm3FpifQ8ViZB5OlMtWinqpZAqJj98hsmnzxv0yYxA0SUXxIKsIMYIuRErYvWZAdjIZCVq5gNH80u6aYqyKZBOpsI9tXQuQDZClwpCcU",
+    "ig_account_id": "17841445410766517",
+    "ig_username": "bugouofertasbrasil"
+  },
+  "sheets": {
+    "spreadsheet_id": "1aM3cuvBHdfCPR28fAdGtlWXix9l8LbYzhTZFYhmahpA",
+    "sheet_name": "Postagens",
+    "col_imagem_url": "imagem_url",
+    "col_legenda": "legenda",
+    "col_hashtags": "hashtags",
+    "col_data_prevista": "data_prevista",
+    "col_finalizado": "finalizado"
+  }
+}
