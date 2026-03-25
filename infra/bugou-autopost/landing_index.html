@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bugou Ofertas Brasil 🔥</title>
+  <meta name="description" content="As melhores ofertas do Brasil em um só lugar. Eletrônicos, moda, casa e muito mais com até 70% OFF."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:#0a0a0a; --card:#111; --border:#1e1e1e;
+      --green:#00ff88; --yellow:#ffd700; --red:#ff3333;
+      --text:#f0f0f0; --muted:#888;
+    }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;}
+
+    /* WA BANNER */
+    .wa-banner{background:linear-gradient(90deg,#075e54,#128c7e);padding:11px 20px;text-align:center;font-size:.88rem;font-weight:600;}
+    .wa-banner a{color:#fff;text-decoration:none;}
+    .wa-banner a:hover{text-decoration:underline;}
+
+    /* HEADER */
+    header{background:#0a0a0a;border-bottom:1px solid var(--border);padding:14px 20px;position:sticky;top:0;z-index:100;}
+    .header-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;}
+    .logo-area{display:flex;align-items:center;gap:12px;}
+    .logo-area img{height:44px;border-radius:8px;}
+    .logo-text{font-size:1.3rem;font-weight:900;color:var(--green);letter-spacing:-.5px;}
+    .logo-sub{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
+    .search-box{flex:1;max-width:400px;display:flex;align-items:center;background:#1a1a1a;border:1px solid var(--border);border-radius:12px;padding:0 14px;gap:8px;}
+    .search-box input{background:none;border:none;outline:none;color:var(--text);font-size:.9rem;padding:10px 0;width:100%;}
+    .search-box input::placeholder{color:var(--muted);}
+
+    /* FILTERS */
+    .filters{max-width:1100px;margin:20px auto 0;padding:0 20px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+    .filter-btn{background:#1a1a1a;border:1px solid var(--border);color:var(--muted);padding:7px 16px;border-radius:20px;font-size:.82rem;cursor:pointer;transition:all .2s;white-space:nowrap;}
+    .filter-btn:hover,.filter-btn.active{background:var(--green);border-color:var(--green);color:#000;font-weight:700;}
+    .offers-count{margin-left:auto;color:var(--muted);font-size:.82rem;}
+
+    /* GRID */
+    .grid{max-width:1100px;margin:20px auto 48px;padding:0 20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px;}
+
+    /* CARD */
+    .card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;transition:transform .2s,border-color .2s,box-shadow .2s;display:flex;flex-direction:column;position:relative;}
+    .card:hover{transform:translateY(-4px);border-color:var(--green);box-shadow:0 8px 32px rgba(0,255,136,.1);}
+    .card-num{position:absolute;top:10px;left:10px;background:rgba(0,0,0,.75);color:var(--yellow);font-size:.68rem;font-weight:700;padding:3px 8px;border-radius:6px;}
+    .badge-off{position:absolute;top:10px;right:10px;background:var(--red);color:#fff;font-size:.7rem;font-weight:800;padding:3px 8px;border-radius:6px;}
+    .card-img{width:100%;height:190px;object-fit:contain;background:#1a1a1a;padding:12px;}
+    .card-body{padding:12px 14px 16px;flex:1;display:flex;flex-direction:column;gap:8px;}
+    .card-platform{font-size:.68rem;font-weight:700;text-transform:uppercase;color:var(--muted);letter-spacing:.5px;}
+    .card-title{font-size:.85rem;font-weight:600;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+    .card-price{margin-top:auto;}
+    .price-old{font-size:.78rem;color:var(--muted);text-decoration:line-through;}
+    .price-new{font-size:1.15rem;font-weight:900;color:var(--green);}
+    .price-disc{font-size:.8rem;font-weight:800;color:var(--yellow);background:rgba(255,215,0,.12);padding:2px 8px;border-radius:6px;margin-top:4px;display:inline-block;}
+    .btn-offer{display:block;text-align:center;background:var(--green);color:#000;font-weight:800;font-size:.85rem;padding:10px;border-radius:10px;text-decoration:none;margin-top:10px;transition:background .2s;}
+    .btn-offer:hover{background:#00e07a;}
+
+    /* STATES */
+    .loading,.empty{text-align:center;padding:60px 20px;color:var(--muted);grid-column:1/-1;}
+    .spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px;}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    footer{border-top:1px solid var(--border);padding:24px 20px;text-align:center;color:var(--muted);font-size:.8rem;}
+    footer a{color:var(--green);text-decoration:none;}
+
+    @media(max-width:600px){
+      .search-box{display:none;}
+      .grid{grid-template-columns:repeat(2,1fr);gap:10px;}
+      .card-img{height:140px;}
+    }
+  </style>
+</head>
+<body>
+
+<div class="wa-banner">
+  📲 Não perca nenhuma oferta! Entre no nosso grupo do WhatsApp →
+  <a href="https://chat.whatsapp.com/C03nHeoBsr59h9dhH81yu8?mode=gi_t" target="_blank">Entrar agora</a>
+</div>
+
+<header>
+  <div class="header-inner">
+    <div class="logo-area">
+      <img src="/logo.jpg" alt="Bugou Ofertas"/>
+      <div>
+        <div class="logo-text">BUGOU!</div>
+        <div class="logo-sub">Ofertas Brasil</div>
+      </div>
+    </div>
+    <div class="search-box">
+      <span>🔍</span>
+      <input type="text" id="searchInput" placeholder="Buscar produto..."/>
+    </div>
+  </div>
+</header>
+
+<div class="filters">
+  <button class="filter-btn active" data-cat="">🔥 Todas</button>
+  <button class="filter-btn" data-cat="Mercado Livre">🛒 Mercado Livre</button>
+  <button class="filter-btn" data-cat="Shoppe">🧡 Shopee</button>
+  <span class="offers-count" id="offersCount"></span>
+</div>
+
+<div class="grid" id="grid">
+  <div class="loading"><div class="spinner"></div><p>Carregando ofertas...</p></div>
+</div>
+
+<footer>
+  <p>🔥 <strong>Bugou Ofertas Brasil</strong> — As melhores promoções em um só lugar</p>
+  <p style="margin-top:8px">
+    <a href="https://www.instagram.com/bugouofertasbrasil" target="_blank">📸 Instagram</a>
+    &nbsp;·&nbsp;
+    <a href="https://chat.whatsapp.com/C03nHeoBsr59h9dhH81yu8?mode=gi_t" target="_blank">💬 WhatsApp</a>
+  </p>
+  <p style="margin-top:8px;color:#444">Preços sujeitos a alteração sem aviso prévio</p>
+</footer>
+
+<script>
+const API = "/api/ofertas";
+let allOffers = [];
+let activeFilter = "";
+let searchTerm = "";
+
+async function loadOffers() {
+  try {
+    const r = await fetch(API);
+    const data = await r.json();
+    allOffers = (data.ofertas || []).map((o, i) => ({...o, num: i + 1}));
+    renderOffers();
+  } catch(e) {
+    document.getElementById("grid").innerHTML = `<div class="empty">😕 Erro ao carregar ofertas</div>`;
+  }
+}
+
+function extractDiscount(preco) {
+  if (!preco) return null;
+  // Extrai % OFF mesmo quando colado ao preço (ex: R$1.08543% OFF -> 43%)
+  const raw = (preco + "").replace(/R\$(\d{1,3}(?:\.\d{3})*(?:,\d{2})?)(\d{1,2})(% OFF)/gi, "R\$$1 \$2\$3");
+  const m = raw.match(/(\d{1,2})%\s*OFF/i);
+  return m ? m[1] + "% OFF" : null;
+}
+
+function extractPrices(preco) {
+  if (!preco) return {old: null, current: ""};
+  let raw = preco + "";
+  // Separa preço colado com desconto: R$332,6743% OFF → R$332,67 + 43% OFF
+  raw = raw.replace(/R\$(\d{1,3}(?:\.\d{3})*(?:,\d{2})?)(\d{1,2})(% OFF)/gi, "R\$$1 \$2\$3");
+  // Remove parcelamento
+  raw = raw.replace(/\d+x\s*R\$.*/gi, "").replace(/sem juros.*/gi, "");
+  // Extrai valores R$
+  const re = /R\$\s*(\d{1,3}(?:\.\d{3})*(?:,\d{2})?)/g;
+  const vals = [];
+  let m;
+  while ((m = re.exec(raw)) !== null) {
+    const num = parseFloat(m[1].replace(/\./g,"").replace(",","."));
+    if (!isNaN(num) && num > 0) vals.push({str: "R$ " + m[1], val: num});
+  }
+  if (vals.length === 0) return {old: null, current: ""};
+  if (vals.length === 1) return {old: null, current: vals[0].str};
+  vals.sort((a,b) => b.val - a.val);
+  return {old: vals[0].str, current: vals[1].str};
+}
+
+function renderOffers() {
+  let list = allOffers;
+
+  if (activeFilter) {
+    list = list.filter(o => (o.plataforma||"").toLowerCase().includes(activeFilter.toLowerCase()));
+  }
+  if (searchTerm) {
+    const s = searchTerm.toLowerCase();
+    list = list.filter(o =>
+      (o.nome||"").toLowerCase().includes(s) ||
+      (o.titulo||"").toLowerCase().includes(s)
+    );
+  }
+
+  document.getElementById("offersCount").textContent =
+    `${list.length} oferta${list.length !== 1 ? "s" : ""}`;
+
+  if (!list.length) {
+    document.getElementById("grid").innerHTML =
+      `<div class="empty">🔍 Nenhuma oferta encontrada</div>`;
+    return;
+  }
+
+  document.getElementById("grid").innerHTML = list.map(o => {
+    const {old: pOld, current: pNew} = extractPrices(o.preco);
+    const disc = extractDiscount(o.preco);
+    const nome = o.titulo || o.nome;
+    return `
+      <div class="card">
+        <span class="card-num">#${o.num}</span>
+        <img class="card-img" src="${o.imagem_url}" alt="${nome}" loading="lazy"
+             onerror="this.style.display='none'"/>
+        <div class="card-body">
+          <div class="card-platform">${o.plataforma || ""}</div>
+          <div class="card-title">${nome}</div>
+          <div class="card-price">
+            ${pOld ? `<div class="price-old">${pOld}</div>` : ""}
+            <div class="price-new">${pNew}</div>
+            ${disc ? `<div class="price-disc">🔥 ${disc}</div>` : ""}
+          </div>
+          <a class="btn-offer" href="${o.link_afiliado}" target="_blank" rel="noopener">
+            🛒 Ver Oferta
+          </a>
+        </div>
+      </div>`;
+  }).join("");
+}
+
+document.querySelectorAll(".filter-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    activeFilter = btn.dataset.cat;
+    renderOffers();
+  });
+});
+
+document.getElementById("searchInput").addEventListener("input", e => {
+  searchTerm = e.target.value;
+  renderOffers();
+});
+
+loadOffers();
+</script>
+</body>
+</html>
