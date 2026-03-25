@@ -195,11 +195,11 @@ def generate_story_image(nome: str, preco: str, imagem_url: str, output_path: st
         draw.rounded_rectangle([40, y_cta-10, W-40, y_cta+58], radius=16, fill=(0,80,50))
         draw.text(((W-cw)//2, y_cta), cta, font=f_cta, fill=(240,240,240))
 
-        # Bio
-        f_bio = ImageFont.truetype(FONT_REG, 34)
-        bio = "🔗 Link da oferta na Bio!"
-        bw = draw.textbbox((0,0), bio, font=f_bio)[2]
-        draw.text(((W-bw)//2, y_cta+88), bio, font=f_bio, fill=(255,215,0))
+        # Seta indicando o link sticker clicável
+        f_seta = ImageFont.truetype(FONT_BOLD, 36)
+        seta = "👆 Toque para ver a oferta!"
+        sw = draw.textbbox((0,0), seta, font=f_seta)[2]
+        draw.text(((W-sw)//2, y_cta+88), seta, font=f_seta, fill=(255,215,0))
 
         canvas.save(output_path, "JPEG", quality=92)
         return True
@@ -208,21 +208,20 @@ def generate_story_image(nome: str, preco: str, imagem_url: str, output_path: st
         return False
 
 # ─── Instagram API ─────────────────────────────────────────────────────────────
-def publish_story(image_path: str, dry_run: bool = False) -> str | None:
-    """Faz upload da imagem para o servidor e publica como Story."""
+def publish_story(image_path: str, link_url: str = "", dry_run: bool = False) -> str | None:
+    """Faz upload da imagem para o servidor e publica como Story com link sticker."""
     if dry_run:
         log("  [DRY-RUN] Publicaria story")
         return "DRY_RUN"
 
-    # Serve a imagem localmente via URL pública
     story_url = f"http://91.98.153.97/stories/{Path(image_path).name}"
-
     log(f"  📤 Criando container do story...")
-    r = requests.post(
-        f"https://graph.facebook.com/v19.0/{IG_ACCOUNT}/media",
-        data={"image_url": story_url, "media_type": "STORIES", "access_token": PAGE_TOKEN},
-        timeout=30
-    )
+
+    payload = {"image_url": story_url, "media_type": "STORIES", "access_token": PAGE_TOKEN}
+    if link_url:
+        payload["sticker_link_url"] = link_url
+
+    r = requests.post(f"https://graph.facebook.com/v19.0/{IG_ACCOUNT}/media", data=payload, timeout=30)
     data = r.json()
     if "id" not in data:
         log(f"  ❌ Erro container story: {data}")
@@ -352,7 +351,8 @@ def main():
                     server_stories.mkdir(exist_ok=True)
                     shutil.copy(str(story_file), str(server_stories / story_file.name))
 
-                story_id = publish_story(str(story_file), dry_run=args.dry_run)
+                link_afiliado = row.get("link_produtos_afiliado", "")
+                story_id = publish_story(str(story_file), link_url=link_afiliado, dry_run=args.dry_run)
                 if story_id:
                     log(f"✅ Story publicado (id={story_id})")
                 else:
