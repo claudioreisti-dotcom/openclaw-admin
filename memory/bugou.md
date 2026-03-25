@@ -82,3 +82,30 @@ Landing Page (bugouofertas.com.br)
 
 ## 📅 Histórico
 - **2026-03-25** — Projeto criado. Configuração completa: Meta API, planilha, autopost, banco, landing page, cron. DNS bugouofertas.com.br em propagação.
+
+---
+
+## 📅 2026-03-25 — Sessão de implantação completa
+
+### O que foi feito:
+- Configuração completa da Meta Graph API (app R4automation)
+- Token de longa duração gerado e salvo
+- Script `autopost.py` criado e funcional
+- Planilha Google Sheets integrada (ID: 1aM3cuvBHdfCPR28fAdGtlWXix9l8LbYzhTZFYhmahpA)
+- Banco Neon exclusivo criado para o Bugou
+- API Flask no servidor (systemd: bugou-api, porta 5051)
+- Landing page criada com design dark + verde neon harmonizado com a logo
+- Nginx configurado para bugouofertas.com.br + proxy /api/
+- 481 ofertas importadas para a landing page
+- 5 últimos posts publicados no Instagram
+- 5 Stories publicados
+- Cron configurado: a cada 30min entre 07h-23h30 (Brasília)
+- DNS bugouofertas.com.br configurado no Registro.br (aguardando propagação)
+- SSL pendente (rodar Certbot após DNS propagar)
+
+### Próximos passos:
+1. ✅ SSL — assim que DNS propagar, rodar: `certbot --nginx -d bugouofertas.com.br -d www.bugouofertas.com.br`
+2. Adicionar Story automático no `autopost.py` para cada novo post
+3. Solicitar revisão Meta para `instagram_manage_comments` e `instagram_manage_messages`
+4. Configurar ManyChat ou resposta automática nos comentários QUERO
+5. Atualizar script `posted.json` no servidor a cada alteração local
