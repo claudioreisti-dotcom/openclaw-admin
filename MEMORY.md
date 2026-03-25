@@ -46,6 +46,18 @@ Minha função:
 - **WhatsApp:** Número dedicado (+55 11 5286-8645) da **R4**, rodando via **OpenClaw**. Sessão pode expirar (erro 401) — reconexão exige re-scan de QR code no OpenClaw
 - **Atenção:** Em 20/03/2026 este número foi bloqueado pela Meta (uso de cliente não-oficial). Chip da **NOXTEC** é separado e não tem relação.
 
+### Bugou Ofertas Brasil (@bugouofertasbrasil)
+- Projeto de afiliados ML + Shopee gerenciado pela R4
+- Servidor: `91.98.153.97` | SSH key: `~/.ssh/bugou_server`
+- Landing: `https://bugouofertas.com.br` | Código: `/var/www/bugouofertas/`
+- Instagram: conta Business, ~3 seguidores (link sticker não disponível)
+- Planilha Google: `1aM3cuvBHdfCPR28fAdGtlWXix9l8LbYzhTZFYhmahpA`
+- Banco: Neon PostgreSQL (`bugou_ofertas`) — DB_URL em TOOLS.md
+- Scripts principais: `autopost.py`, `check_prices.py`, `reply_comments.py`
+- App ML: client_id=2011509902700059 / secret=OuZdRV9F01mdzBb40MXPGYiUOpoD2F7p
+- Shopee API: app_id=18183220010 / secret=6BXW2AILILMWL53D6QZCHO4XAA2ZRV7S
+- Crons: autopost a cada 30min (7h-23h30), check_prices diário 9h UTC, reply_comments a cada 5min
+
 ### Contexto Empresarial
 - Cláudio é **Gerente de TI na NOXTEC** — responsável pelo time de dev e implantação do ecossistema NoxCare
 - Cláudio é **proprietário da R4** Tecnologia, Inovação e Comércio Ltda — desenvolvimento de sistemas e automações
