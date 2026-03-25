@@ -184,6 +184,31 @@ def main():
         linhas = caption_base.splitlines()
         linhas = [l for l in linhas if not l.strip().startswith("🔗")]
 
+        # Formata preços: ~R$ X~ → *R$ Y* vira "de: R$ X por apenas R$ Y"
+        # Se valores iguais, vira "por apenas R$ Y"
+        import re
+        texto = "\n".join(linhas)
+
+        def formatar_preco(m):
+            preco_old = m.group(1).strip()
+            preco_new = m.group(2).strip()
+            # Remove markdown do preço novo (asteriscos)
+            preco_new_clean = preco_new.replace("*", "").strip()
+            preco_old_clean = preco_old.replace("~", "").strip()
+            if preco_old_clean == preco_new_clean:
+                return f"por apenas {preco_new_clean}"
+            return f"de: {preco_old_clean} por apenas {preco_new_clean}"
+
+        # Padrão: ~R$ X.XXX~ → *R$ X.XXX*
+        texto = re.sub(
+            r'~(R\$[^~]+)~\s*[→➝-]+\s*\*(R\$[^*]+)\*',
+            formatar_preco,
+            texto
+        )
+        # Remove markdown residual: *texto* → texto, ~texto~ → texto
+        texto = re.sub(r'\*([^*]+)\*', r'\1', texto)
+        texto = re.sub(r'~([^~]+)~', r'\1', texto)
+
         # Adiciona CTA e grupo WhatsApp
         cta = (
             "\n\n💬 Comente QUERO que te enviamos o link da oferta!"
@@ -191,7 +216,7 @@ def main():
             "\n👉 Link do grupo na Bio!"
         )
 
-        caption = "\n".join(linhas).strip() + cta
+        caption = texto.strip() + cta
 
         log(f"\n▶️  [{idx}] {nome[:60]}")
         post_id = post_to_instagram(imagem, caption, dry_run=args.dry_run)
