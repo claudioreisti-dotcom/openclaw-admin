@@ -68,6 +68,28 @@ Landing Page (bugouofertas.com.br)
 
 ---
 
+## 🖥️ Landing Page — Comportamento Obrigatório
+
+> ⚠️ NÃO ALTERAR sem autorização explícita de Cláudio.
+
+**API (`/api/ofertas`):**
+- Retorna **TODOS** os produtos — ativos E esgotados
+- Ordenação: `publicado_em DESC NULLS LAST, id DESC` (mais recente primeiro)
+- Filtragem por plataforma e busca: OK
+- **NÃO filtrar por `ativo = TRUE`** — a landing exibe tudo, com badge "⛔ ESGOTADO" visual nos inativos
+
+**Numeração dos anúncios:**
+- Usar `o.id` do banco (não `i+1` do array)
+- É incremental, estável e igual em landing + stories Instagram
+- Não muda com filtros, ordenação ou remoções
+
+**Produtos vs Instagram:**
+- Produtos entram no banco ANTES de publicar no Instagram (landing exibe imediatamente)
+- `ig_post_id` pode ser `NULL` — isso é normal e esperado
+- Nunca inserir duplicatas — verificar por `imagem_url` antes de inserir
+
+---
+
 ## 💬 Estratégia de engajamento
 - Caption dos posts: remove link direto, substitui por "Comente QUERO"
 - CTA: *"Comente QUERO que te enviamos o link da oferta!"*
