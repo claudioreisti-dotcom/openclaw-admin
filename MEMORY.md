@@ -56,7 +56,17 @@ Minha função:
 - Scripts principais: `autopost.py`, `check_prices.py`, `reply_comments.py`
 - App ML: client_id=2011509902700059 / secret=OuZdRV9F01mdzBb40MXPGYiUOpoD2F7p
 - Shopee API: app_id=18183220010 / secret=6BXW2AILILMWL53D6QZCHO4XAA2ZRV7S
-- Crons: autopost a cada 30min (7h-23h30), check_prices diário 9h UTC, reply_comments a cada 5min
+- Scripts principais: `autopost.py`, `check_prices.py`, `reply_comments.py`, `wpp_autopost.py`
+- App ML: client_id=2011509902700059 / secret=OuZdRV9F01mdzBb40MXPGYiUOpoD2F7p
+- Shopee API: app_id=18183220010 / secret=6BXW2AILILMWL53D6QZCHO4XAA2ZRV7S
+- **Crons (BRT):**
+  - Instagram autopost: a cada 30min (10h-23h30 + 0h-2h30)
+  - WhatsApp ML: `0 7-22/2` (7h, 9h... 21h) — 1 oferta ML
+  - WhatsApp Shopee: `5 7-22/2` (7h05, 9h05... 21h05) — 1 oferta Shopee
+  - check_prices: 6h, 12h, 18h, 0h
+  - reply_comments: a cada 5min
+- **Bug corrigido 2026-03-30:** cron wpp_autopost usava `12-1` inválido; corrigido para horário 7h-22h de 2 em 2h
+- **Atenção:** quando banco esgota ofertas novas, Instagram para de postar. Solução: rodar garimpo
 
 ### Contexto Empresarial
 - Cláudio é **Gerente de TI na NOXTEC** — responsável pelo time de dev e implantação do ecossistema NoxCare

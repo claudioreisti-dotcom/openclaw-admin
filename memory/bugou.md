@@ -102,8 +102,24 @@ Landing Page (bugouofertas.com.br)
 
 ---
 
+## 🤖 WhatsApp Autopost (wpp_autopost.py)
+- **Script:** `/var/www/bugouofertas/wpp_autopost.py`
+- **Crons (BRT):**
+  - `0 7-22/2 * * *` → 1 oferta do **ML** (7h, 9h, 11h, 13h, 15h, 17h, 19h, 21h)
+  - `5 7-22/2 * * *` → 1 oferta da **Shopee** (7h05, 9h05, ..., 21h05)
+- **Total:** 16 posts/dia no WhatsApp (8 ML + 8 Shopee)
+- **Log:** `/var/log/bugou-wpp-autopost.log`
+- **Grupo WPP:** `https://chat.whatsapp.com/C03nHeoBsr59h9dhH81yu8`
+- **Correção 2026-03-30:** Bug no cron `12-1` era inválido — corrigido para horário correto
+
+## ⚠️ Problema recorrente — Banco sem ofertas novas
+- O `autopost.py` posta apenas ofertas com `ig_post_id IS NULL`
+- Quando o banco esgota ofertas novas, o script para de postar ("0 post(s) pendente(s)")
+- Solução: rodar garimpo (ML/Shopee) para abastecer com produtos novos
+
 ## 📅 Histórico
 - **2026-03-25** — Projeto criado. Configuração completa: Meta API, planilha, autopost, banco, landing page, cron. DNS bugouofertas.com.br em propagação.
+- **2026-03-30** — Diagnóstico e correção de posts parados. Bug no cron do wpp_autopost corrigido. WhatsApp ajustado para 1 ML + 1 Shopee a cada 2h (7h-22h).
 
 ---
 

@@ -54,3 +54,18 @@ Skills define _how_ tools work. This file is for _your_ specifics — the stuff 
 - **Client ID:** 42e0e89d-e378-47ce-83e0-c61c6e01a533
 - **Client Secret:** 5yi8Q~rG8KDC70E9u_AWZmNf_v7EawXab8dFia2Y
 - **Permissões necessárias:** Mail.Read, Mail.Send, Mail.ReadWrite (admin consent pendente)
+
+## HetrixTools
+
+- **URL:** https://hetrixtools.com/login/
+- **Usuário:** creys2005@gmail.com
+- **Senha:** 214833Oidu@lc
+- **Uso:** Monitoramento externo + blacklist monitoring
+- **Monitores:** R4 Frota e R4 Telemetria
+- **Ajuste pendente:** Trocar URL de `/` para `/health/ready` nos monitores do Frota/Telemetria
+
+## Gmail Pessoal (Cláudio)
+
+- **Email:** creys2005@gmail.com
+- **Senha:** 214833Oidu@lc
+- **Nota:** App Password para IMAP não configurada ainda
