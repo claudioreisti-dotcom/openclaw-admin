@@ -83,3 +83,42 @@ Minha função:
 - **2026-03-18** → `memory/2026-03-18.md` — Primeira conversa. Nome Alfred definido. Sala de Controle criada (Neon + Metabase). 38 demandas importadas.
 - **2026-03-19** → `memory/2026-03-19.md` — Projeto Eli criado, bot Telegram, 1.496 transações importadas.
 - **2026-03-20** → `memory/2026-03-20.md` — Avatar Eli criado. Revisão completa das demandas. Melhorias no heartbeat e Metabase. WhatsApp R4 bloqueado pela Meta.
+
+---
+
+## 🏢 Escritório Virtual R4 (WorkAdventure)
+
+- **URL:** https://office.r4.app.br
+- **Servidor:** 46.225.182.16 (ubuntu-8gb-openclaw-1)
+- **Instalado em:** 2026-03-30
+- **Stack:** WorkAdventure v1.29.3 (6 containers Docker) + Nginx + Let's Encrypt
+- **Containers:** play, back, map-storage, uploader, icon, redis
+- **Compose:** `/opt/workadventure-r4/docker-compose.yml`
+- **Env:** `/opt/workadventure-r4/.env`
+- **Mapas:** `/opt/workadventure-r4/data/maps/` (volume Docker)
+- **Mapa atual:** `office.tmj` (starter-kit WorkAdventure — template vazio)
+- **START_ROOM_URL:** `/_/global/office.r4.app.br/map-storage/office.tmj`
+- **Admin token:** em `.env` → `ADMIN_API_TOKEN`
+- **Upload de mapas:** `POST http://<map-storage-ip>:3000/upload` com ZIP + Bearer token
+
+### Configuração Nginx
+- Config: `/etc/nginx/sites-available/r4-kanban`
+- `/ws/` → play:3001 (WebSocket/Pusher)
+- `/map-storage/` → map-storage:3000
+- `/kanban` → kanban API :5010
+- `/` → play:3000 (frontend)
+
+### ⚠️ Atenção após restart
+- IPs dos containers mudam ao recriar — atualizar Nginx
+- Mapa precisa ser re-uploaded após `docker compose down` (volume persiste mas mapa via API some)
+- Script de atualização automática do Nginx ainda não criado
+
+## 🗂️ Painel Kanban R4
+
+- **URL:** https://office.r4.app.br/kanban/
+- **API:** https://office.r4.app.br/api/
+- **Serviço:** systemd `r4-kanban` → `/opt/r4-kanban/api.py` (Flask, porta 5010)
+- **Banco:** tabela `agent_activities` no Neon do Alfred
+- **Agentes:** alfred, eli, bugou
+- **Auto-refresh:** 10 segundos
+- **Colunas:** A Fazer → Em Andamento → Concluído
