@@ -24,6 +24,10 @@ Skills define _how_ tools work. This file is for _your_ specifics — the stuff 
 - **Tabelas:** `projetos`, `demandas`, `gastos`, `notas`
 - **Uso:** Sala de controle — demandas, projetos, gastos pessoais/profissionais
 
+## Telegram Grupos
+
+- **OpennClaudio:** `-5029968288`
+
 ## WhatsApp Alfred
 - **Número:** +55 11 52868645 → (11) 5286-8645
 - **Uso:** Número dedicado para Alfred atender via WhatsApp

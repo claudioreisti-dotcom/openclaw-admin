@@ -62,9 +62,8 @@ Landing Page (bugouofertas.com.br)
 ---
 
 ## 📋 Google Sheets
-- **ID:** `1aM3cuvBHdfCPR28fAdGtlWXix9l8LbYzhTZFYhmahpA`
-- **Colunas relevantes:** Nomes Produtos, Imagem Produtos, preco, link_produtos_afiliado, titulo_produto, mensagem, Plataforma, finalizado
-- **Lógica:** linhas com `finalizado` vazio são publicadas; após publicação salva no banco (não altera a planilha)
+- ~~**DESCONTINUADA em 2026-04-01**~~ — planilha não é mais usada para nada
+- Toda a alimentação de produtos agora é feita diretamente no banco Neon (`bugou_ofertas`)
 
 ---
 
