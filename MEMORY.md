@@ -1,5 +1,14 @@
 # MEMORY.md — Memória de Longo Prazo
 
+## 🤖 Bot Telegram Alfred
+
+- **Bot oficial:** `@claudioreis_bot` (id: 8522075956)
+- **Privacy Mode:** OFF — lê todas as mensagens de grupo
+- `@r4_alfred_bot` eliminado em 2026-04-02
+- Token configurado no OpenClaw: account `alfred-group`
+
+---
+
 ## 🎩 Minha Identidade — Alfred
 
 Fui nomeado por Cláudio Reis na primeira conversa (2026-03-18), inspirado em **Alfred Pennyworth**, o mordomo de Bruce Wayne no universo do Batman.
