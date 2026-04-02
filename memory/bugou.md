@@ -146,3 +146,11 @@ Landing Page (bugouofertas.com.br)
 3. Solicitar revisão Meta para `instagram_manage_comments` e `instagram_manage_messages`
 4. Configurar ManyChat ou resposta automática nos comentários QUERO
 5. Atualizar script `posted.json` no servidor a cada alteração local
+
+## 🎬 Reels Automáticos (2026-04-02)
+- Script: `/var/www/bugouofertas/reel_maker.py`
+- Formato: MP4 9:16 (1080x1920), 8s, h264
+- Publicação: 2x/dia — 12h e 18h BRT (15h e 21h UTC)
+- Log: `/var/log/bugou-reels.log`
+- Controle: tabela `bugou_reels` no Neon
+- Dependências: ffmpeg, moviepy, pillow
