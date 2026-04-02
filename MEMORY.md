@@ -1,5 +1,12 @@
 # MEMORY.md — Memória de Longo Prazo
 
+## 💰 Regra de Custos — OBRIGATÓRIO
+
+- **Sempre operar sem custo** — priorizar soluções gratuitas, locais, open source
+- **Antes de qualquer ação com custo:** informar o valor estimado e aguardar autorização explícita de Cláudio
+- Isso vale para **tudo**: APIs pagas, servidores, domínios, créditos, ferramentas, serviços externos
+- Sem autorização → não executa. Sem exceção.
+
 ## 🤖 Bot Telegram Alfred
 
 - **Bot oficial:** `@claudioreis_bot` (id: 8522075956)
