@@ -29,6 +29,27 @@ export function AppSidebar({ user }: AppSidebarProps) {
 
   return (
     <>
+      {/* Mobile bottom nav */}
+      <nav
+        className="md:hidden fixed bottom-0 left-0 right-0 z-50 flex border-t"
+        style={{ background: "var(--color-bg-1)", borderColor: "var(--color-line)" }}
+      >
+        {navItems.map((item) => {
+          const active = pathname.startsWith(item.href)
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="flex flex-col items-center justify-center flex-1 py-2 gap-0.5"
+              style={{ color: active ? "var(--color-accent)" : "var(--color-fg-3)" }}
+            >
+              <item.icon className="h-5 w-5 shrink-0" />
+              <span className="text-[9px] font-medium">{item.label}</span>
+            </Link>
+          )
+        })}
+      </nav>
+
       {/* Desktop sidebar */}
       <aside
         className="hidden md:flex flex-col w-52 shrink-0 border-r"

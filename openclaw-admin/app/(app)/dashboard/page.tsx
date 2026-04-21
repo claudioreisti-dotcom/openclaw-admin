@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import { db } from "@/lib/db"
 import { demandas, projetos } from "@/lib/db/schema"
-import { eq, count } from "drizzle-orm"
+import { eq, count, or, desc } from "drizzle-orm"
 import { DashboardStats } from "@/components/features/dashboard-stats"
 import { RecentDemandas } from "@/components/features/recent-demandas"
 
@@ -18,10 +18,14 @@ export default async function DashboardPage() {
     ultimasDemandas,
   ] = await Promise.all([
     db.select({ value: count() }).from(demandas),
-    db.select({ value: count() }).from(demandas).where(eq(demandas.status, "concluida")),
-    db.select({ value: count() }).from(demandas).where(eq(demandas.status, "pendente")),
+    db.select({ value: count() }).from(demandas).where(
+      or(eq(demandas.status, "concluida"), eq(demandas.status, "concluido"))
+    ),
+    db.select({ value: count() }).from(demandas).where(
+      or(eq(demandas.status, "aguardando"), eq(demandas.status, "pendente"), eq(demandas.status, "backlog"))
+    ),
     db.select({ value: count() }).from(projetos),
-    db.select().from(demandas).orderBy(demandas.criadoEm).limit(10),
+    db.select().from(demandas).orderBy(desc(demandas.criadoEm)).limit(10),
   ])
 
   const stats = {

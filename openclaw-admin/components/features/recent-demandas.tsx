@@ -4,12 +4,15 @@ import type { InferSelectModel } from "drizzle-orm"
 
 type Demanda = InferSelectModel<typeof demandas>
 
-const statusConfig = {
-  pendente: { label: "Pendente", color: "var(--color-warn)" },
-  em_andamento: { label: "Em andamento", color: "var(--color-info)" },
-  concluida: { label: "Concluída", color: "var(--color-ok)" },
-  cancelada: { label: "Cancelada", color: "var(--color-fg-3)" },
-} as const
+const statusConfig: Record<string, { label: string; color: string }> = {
+  pendente:    { label: "Pendente",    color: "var(--color-warn)" },
+  aguardando:  { label: "Aguardando",  color: "var(--color-warn)" },
+  backlog:     { label: "Backlog",     color: "var(--color-fg-3)" },
+  em_andamento:{ label: "Em andamento",color: "var(--color-info)" },
+  concluida:   { label: "Concluída",   color: "var(--color-ok)" },
+  concluido:   { label: "Concluído",   color: "var(--color-ok)" },
+  cancelada:   { label: "Cancelada",   color: "var(--color-fg-3)" },
+}
 
 export function RecentDemandas({ demandas }: { demandas: Demanda[] }) {
   return (
@@ -39,7 +42,7 @@ export function RecentDemandas({ demandas }: { demandas: Demanda[] }) {
           </p>
         )}
         {demandas.map((d) => {
-          const st = statusConfig[d.status as keyof typeof statusConfig] ?? statusConfig.pendente
+          const st = statusConfig[d.status ?? ""] ?? { label: d.status ?? "—", color: "var(--color-fg-3)" }
           return (
             <Link
               key={d.id}

@@ -12,7 +12,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <AppSidebar user={session.user} />
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
         <AppHeader user={session.user} />
-        <main className="flex-1 overflow-auto p-4 md:p-6">{children}</main>
+        <main className="flex-1 overflow-auto p-4 pb-20 md:pb-6 md:p-6">{children}</main>
       </div>
     </div>
   )
