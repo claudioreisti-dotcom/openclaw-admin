@@ -18,7 +18,6 @@ import {
   Bot,
   Settings,
   Plus,
-  Search,
 } from "lucide-react"
 
 interface SearchResult {
