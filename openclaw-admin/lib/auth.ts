@@ -10,7 +10,10 @@ const loginSchema = z.object({
   password: z.string().min(6),
 })
 
+const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? ""
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  basePath: `${BASE}/api/auth`,
   providers: [
     Credentials({
       async authorize(credentials) {
@@ -37,6 +40,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   ],
   session: { strategy: "jwt" },
   pages: {
-    signIn: "/login",
+    signIn: `${BASE}/login`,
   },
 })
