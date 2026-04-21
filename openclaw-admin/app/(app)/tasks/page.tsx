@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import { db } from "@/lib/db"
 import { demandas, projetos } from "@/lib/db/schema"
-import { eq, ilike, or, desc, count, and } from "drizzle-orm"
+import { eq, ilike, or, desc, count, and, inArray } from "drizzle-orm"
 import { TasksTable } from "@/components/features/tasks-table"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
@@ -28,7 +28,12 @@ export default async function TasksPage({ searchParams }: PageProps) {
 
   // Build where conditions
   const conditions = []
-  if (params.status) conditions.push(eq(demandas.status, params.status))
+  if (params.status) {
+    const statuses = params.status.split(",").filter(Boolean)
+    // expand concluida → concluida + concluido (alias do bot)
+    const expanded = statuses.flatMap((s) => s === "concluida" ? ["concluida", "concluido"] : [s])
+    conditions.push(expanded.length === 1 ? eq(demandas.status, expanded[0]!) : inArray(demandas.status, expanded))
+  }
   if (params.prioridade) conditions.push(eq(demandas.prioridade, params.prioridade))
   if (params.projeto) conditions.push(eq(demandas.projetoId, Number(params.projeto)))
   if (params.q) {

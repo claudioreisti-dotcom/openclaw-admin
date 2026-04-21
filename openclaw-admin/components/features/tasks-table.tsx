@@ -85,6 +85,19 @@ export function TasksTable({ demandas, projetos, page, totalPages, filters }: Ta
   const [isPending, startTransition] = useTransition()
   const [loadingId, setLoadingId] = useState<number | null>(null)
 
+  // Multi-status filter
+  const activeStatuses = new Set((filters.status ?? "").split(",").filter(Boolean))
+
+  const toggleStatus = (value: string) => {
+    const next = new Set(activeStatuses)
+    next.has(value) ? next.delete(value) : next.add(value)
+    const params = new URLSearchParams(searchParams.toString())
+    if (next.size > 0) params.set("status", [...next].join(","))
+    else params.delete("status")
+    params.delete("page")
+    router.push(`${pathname}?${params.toString()}`)
+  }
+
   // Search with debounce
   const [searchVal, setSearchVal] = useState(filters.q ?? "")
   const firstRender = useRef(true)
@@ -173,6 +186,33 @@ export function TasksTable({ demandas, projetos, page, totalPages, filters }: Ta
 
   return (
     <div className="space-y-3">
+      {/* Status toggle pills */}
+      <div className="flex flex-wrap gap-1.5">
+        {statusFilterOptions.map(({ value, label }) => {
+          const active = activeStatuses.has(value)
+          const st = statusConfig[value] ?? { color: "#5f6875", bg: "rgba(95,104,117,.10)" }
+          return (
+            <button
+              key={value}
+              type="button"
+              onClick={() => toggleStatus(value)}
+              className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-medium border transition-all"
+              style={active ? {
+                color: st.color,
+                background: st.bg,
+                borderColor: st.color + "55",
+              } : {
+                color: "var(--color-fg-3)",
+                background: "transparent",
+                borderColor: "var(--color-line)",
+              }}
+            >
+              {label}
+            </button>
+          )
+        })}
+      </div>
+
       {/* Filters */}
       <div className="flex flex-wrap gap-2">
         {/* Search */}
@@ -202,18 +242,6 @@ export function TasksTable({ demandas, projetos, page, totalPages, filters }: Ta
         </div>
 
         <select
-          value={filters.status ?? ""}
-          onChange={(e) => updateParam("status", e.target.value || undefined)}
-          className="h-7 text-xs rounded px-2 border"
-          style={selectStyle}
-        >
-          <option value="">Todos os status</option>
-          {statusFilterOptions.map(({ value, label }) => (
-            <option key={value} value={value}>{label}</option>
-          ))}
-        </select>
-
-        <select
           value={filters.prioridade ?? ""}
           onChange={(e) => updateParam("prioridade", e.target.value || undefined)}
           className="h-7 text-xs rounded px-2 border"
@@ -237,7 +265,7 @@ export function TasksTable({ demandas, projetos, page, totalPages, filters }: Ta
           ))}
         </select>
 
-        {hasFilters && (
+        {(filters.prioridade || filters.projeto || filters.q) && (
           <Button
             variant="ghost"
             size="sm"
@@ -245,7 +273,12 @@ export function TasksTable({ demandas, projetos, page, totalPages, filters }: Ta
             style={{ color: "var(--color-fg-3)" }}
             onClick={() => {
               setSearchVal("")
-              router.push(pathname)
+              const params = new URLSearchParams(searchParams.toString())
+              params.delete("prioridade")
+              params.delete("projeto")
+              params.delete("q")
+              params.delete("page")
+              router.push(`${pathname}?${params.toString()}`)
             }}
           >
             Limpar filtros
