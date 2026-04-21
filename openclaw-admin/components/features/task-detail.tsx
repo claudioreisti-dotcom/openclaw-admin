@@ -15,6 +15,7 @@ import { ArrowLeft, Save, Trash2 } from "lucide-react"
 import Link from "next/link"
 import type { InferSelectModel } from "drizzle-orm"
 import type { demandas, projetos, notas } from "@/lib/db/schema"
+import { apiUrl } from "@/lib/api"
 
 type Demanda = InferSelectModel<typeof demandas>
 type Projeto = Pick<InferSelectModel<typeof projetos>, "id" | "nome">
@@ -56,7 +57,7 @@ export function TaskDetail({ demanda, projetos, notas }: TaskDetailProps) {
 
   async function onSubmit(data: FormData) {
     setSaving(true)
-    const res = await fetch(`/api/tasks/${demanda.id}`, {
+    const res = await fetch(apiUrl(`/api/tasks/${demanda.id}`), {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
@@ -72,7 +73,7 @@ export function TaskDetail({ demanda, projetos, notas }: TaskDetailProps) {
 
   async function onDelete() {
     if (!confirm("Excluir esta demanda?")) return
-    const res = await fetch(`/api/tasks/${demanda.id}`, { method: "DELETE" })
+    const res = await fetch(apiUrl(`/api/tasks/${demanda.id}`), { method: "DELETE" })
     if (res.ok) {
       toast.success("Demanda excluída")
       router.push("/tasks")

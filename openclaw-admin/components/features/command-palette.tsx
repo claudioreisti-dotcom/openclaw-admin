@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react"
 import { useRouter } from "next/navigation"
+import { apiUrl } from "@/lib/api"
 import {
   CommandDialog,
   CommandEmpty,
@@ -58,7 +59,7 @@ export function CommandPalette() {
     if (!q.trim()) { setResults([]); return }
     setLoading(true)
     try {
-      const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`)
+      const res = await fetch(apiUrl(`/api/search?q=${encodeURIComponent(q)}`))
       if (res.ok) setResults(await res.json() as SearchResult[])
     } finally {
       setLoading(false)
