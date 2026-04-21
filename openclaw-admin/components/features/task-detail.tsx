@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
-import { ArrowLeft, Save, Trash2 } from "lucide-react"
+import { ArrowLeft, Save, Trash2, Plus, Loader2 } from "lucide-react"
 import Link from "next/link"
 import type { InferSelectModel } from "drizzle-orm"
 import type { demandas, projetos, notas } from "@/lib/db/schema"
@@ -41,6 +41,32 @@ interface TaskDetailProps {
 export function TaskDetail({ demanda, projetos, notas }: TaskDetailProps) {
   const router = useRouter()
   const [saving, setSaving] = useState(false)
+
+  const [notasList, setNotasList] = useState<Nota[]>(notas)
+  const [addingNota, setAddingNota] = useState(false)
+  const [savingNota, setSavingNota] = useState(false)
+  const [notaForm, setNotaForm] = useState({ titulo: "", conteudo: "" })
+
+  async function handleAddNota(e: React.FormEvent) {
+    e.preventDefault()
+    if (!notaForm.conteudo.trim()) return
+    setSavingNota(true)
+    const res = await fetch(apiUrl(`/api/tasks/${demanda.id}/notes`), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ titulo: notaForm.titulo || undefined, conteudo: notaForm.conteudo }),
+    })
+    setSavingNota(false)
+    if (res.ok) {
+      const nova = await res.json() as Nota
+      setNotasList((prev) => [nova, ...prev])
+      setNotaForm({ titulo: "", conteudo: "" })
+      setAddingNota(false)
+      toast.success("Nota adicionada")
+    } else {
+      toast.error("Erro ao salvar nota")
+    }
+  }
 
   const { register, handleSubmit } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -177,27 +203,86 @@ export function TaskDetail({ demanda, projetos, notas }: TaskDetailProps) {
         </Button>
       </form>
 
-      {notas.length > 0 && (
-        <div
-          className="rounded-[10px] border"
-          style={{ background: "var(--color-bg-1)", borderColor: "var(--color-line)" }}
-        >
-          <div className="px-4 py-3 border-b text-xs font-semibold" style={{ borderColor: "var(--color-line)", color: "var(--color-fg)" }}>
-            Notas ({notas.length})
-          </div>
-          <div className="divide-y" style={{ borderColor: "var(--color-line)" }}>
-            {notas.map((n) => (
-              <div key={n.id} className="px-4 py-3 space-y-1">
-                {n.titulo && <p className="text-xs font-medium" style={{ color: "var(--color-fg-1)" }}>{n.titulo}</p>}
-                <p className="text-xs" style={{ color: "var(--color-fg-2)" }}>{n.conteudo}</p>
-                <p className="text-[10px]" style={{ color: "var(--color-fg-4)" }}>
-                  {n.criadoEm ? format(new Date(n.criadoEm), "dd MMM yyyy HH:mm", { locale: ptBR }) : ""}
-                </p>
-              </div>
-            ))}
-          </div>
+      <div
+        className="rounded-[10px] border"
+        style={{ background: "var(--color-bg-1)", borderColor: "var(--color-line)" }}
+      >
+        <div className="flex items-center justify-between px-4 py-3 border-b" style={{ borderColor: "var(--color-line)" }}>
+          <span className="text-xs font-semibold" style={{ color: "var(--color-fg)" }}>
+            Notas {notasList.length > 0 && `(${notasList.length})`}
+          </span>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-6 text-xs gap-1"
+            style={{ color: "var(--color-accent)" }}
+            onClick={() => setAddingNota((v) => !v)}
+          >
+            <Plus className="h-3 w-3" />
+            Adicionar
+          </Button>
         </div>
-      )}
+
+        {addingNota && (
+          <form onSubmit={handleAddNota} className="px-4 py-3 space-y-2 border-b" style={{ borderColor: "var(--color-line)" }}>
+            <input
+              placeholder="Título (opcional)"
+              value={notaForm.titulo}
+              onChange={(e) => setNotaForm((f) => ({ ...f, titulo: e.target.value }))}
+              className="w-full rounded px-3 py-1.5 text-xs border"
+              style={{ background: "var(--color-bg-3)", borderColor: "var(--color-line)", color: "var(--color-fg)" }}
+            />
+            <textarea
+              placeholder="Conteúdo…"
+              rows={3}
+              required
+              value={notaForm.conteudo}
+              onChange={(e) => setNotaForm((f) => ({ ...f, conteudo: e.target.value }))}
+              className="w-full rounded px-3 py-1.5 text-xs border resize-y"
+              style={{ background: "var(--color-bg-3)", borderColor: "var(--color-line)", color: "var(--color-fg)" }}
+            />
+            <div className="flex gap-2">
+              <Button
+                type="submit"
+                size="sm"
+                className="h-6 text-xs gap-1"
+                disabled={savingNota}
+                style={{ background: "var(--color-accent)", color: "var(--color-accent-fg)", border: "none" }}
+              >
+                {savingNota ? <Loader2 className="h-3 w-3 animate-spin" /> : <Save className="h-3 w-3" />}
+                Salvar
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-6 text-xs"
+                style={{ color: "var(--color-fg-3)" }}
+                onClick={() => { setAddingNota(false); setNotaForm({ titulo: "", conteudo: "" }) }}
+              >
+                Cancelar
+              </Button>
+            </div>
+          </form>
+        )}
+
+        <div className="divide-y" style={{ borderColor: "var(--color-line)" }}>
+          {notasList.length === 0 && !addingNota && (
+            <p className="px-4 py-6 text-xs text-center" style={{ color: "var(--color-fg-3)" }}>
+              Nenhuma nota ainda
+            </p>
+          )}
+          {notasList.map((n) => (
+            <div key={n.id} className="px-4 py-3 space-y-1">
+              {n.titulo && <p className="text-xs font-medium" style={{ color: "var(--color-fg-1)" }}>{n.titulo}</p>}
+              <p className="text-xs" style={{ color: "var(--color-fg-2)" }}>{n.conteudo}</p>
+              <p className="text-[10px]" style={{ color: "var(--color-fg-4)" }}>
+                {n.criadoEm ? format(new Date(n.criadoEm), "dd MMM yyyy HH:mm", { locale: ptBR }) : ""}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   )
 }

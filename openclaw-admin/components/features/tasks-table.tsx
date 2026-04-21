@@ -16,14 +16,22 @@ type Demanda = InferSelectModel<typeof demandas>
 type Projeto = Pick<InferSelectModel<typeof projetos>, "id" | "nome">
 
 const statusConfig: Record<string, { label: string; color: string }> = {
-  pendente:    { label: "Pendente",    color: "var(--color-warn)" },
   aguardando:  { label: "Aguardando",  color: "var(--color-warn)" },
   backlog:     { label: "Backlog",     color: "var(--color-fg-3)" },
   em_andamento:{ label: "Em andamento",color: "var(--color-info)" },
   concluida:   { label: "Concluída",   color: "var(--color-ok)" },
-  concluido:   { label: "Concluído",   color: "var(--color-ok)" },
+  concluido:   { label: "Concluída",   color: "var(--color-ok)" }, // alias do bot
   cancelada:   { label: "Cancelada",   color: "var(--color-fg-3)" },
 }
+
+// Status únicos para o filtro (sem duplicatas)
+const statusFilterOptions = [
+  { value: "aguardando",   label: "Aguardando" },
+  { value: "backlog",      label: "Backlog" },
+  { value: "em_andamento", label: "Em andamento" },
+  { value: "concluida",    label: "Concluída" },
+  { value: "cancelada",    label: "Cancelada" },
+]
 
 const prioridadeConfig = {
   baixa: { label: "Baixa", color: "var(--color-fg-3)" },
@@ -125,8 +133,8 @@ export function TasksTable({ demandas, projetos, page, totalPages, filters }: Ta
           style={selectStyle}
         >
           <option value="">Todos os status</option>
-          {Object.entries(statusConfig).map(([k, v]) => (
-            <option key={k} value={k}>{v.label}</option>
+          {statusFilterOptions.map(({ value, label }) => (
+            <option key={value} value={value}>{label}</option>
           ))}
         </select>
         <select
@@ -310,21 +318,36 @@ export function TasksTable({ demandas, projetos, page, totalPages, filters }: Ta
         {demandas.map((d) => {
           const st = statusConfig[d.status ?? ""] ?? { label: d.status ?? "—", color: "var(--color-fg-3)" }
           const pr = prioridadeConfig[d.prioridade as keyof typeof prioridadeConfig] ?? prioridadeConfig.media
+          const isSelected = selected.has(d.id)
           return (
-            <Link
+            <div
               key={d.id}
-              href={`/tasks/${d.id}`}
-              className="block rounded-[10px] border p-3 space-y-1.5"
-              style={{ background: "var(--color-bg-1)", borderColor: "var(--color-line)" }}
+              className="flex items-start gap-2.5 rounded-[10px] border p-3"
+              style={{
+                background: isSelected ? "var(--color-bg-2)" : "var(--color-bg-1)",
+                borderColor: isSelected ? "var(--color-accent-line, rgba(201,240,74,.34))" : "var(--color-line)",
+              }}
             >
-              <p className="text-xs font-medium line-clamp-2" style={{ color: "var(--color-fg)" }}>
-                {d.titulo}
-              </p>
-              <div className="flex gap-3">
-                <span className="text-[10px]" style={{ color: st.color }}>{st.label}</span>
-                <span className="text-[10px]" style={{ color: pr.color }}>{pr.label}</span>
-              </div>
-            </Link>
+              <input
+                type="checkbox"
+                checked={isSelected}
+                onChange={() => toggleOne(d.id)}
+                className="mt-0.5 w-4 h-4 rounded accent-[var(--color-accent)] cursor-pointer shrink-0"
+              />
+              <Link
+                href={`/tasks/${d.id}`}
+                className="flex-1 min-w-0 space-y-1.5"
+                onClick={(e) => { if (selected.size > 0) e.preventDefault(); toggleOne(d.id) }}
+              >
+                <p className="text-xs font-medium line-clamp-2" style={{ color: "var(--color-fg)" }}>
+                  {d.titulo}
+                </p>
+                <div className="flex gap-3">
+                  <span className="text-[10px]" style={{ color: st.color }}>{st.label}</span>
+                  <span className="text-[10px]" style={{ color: pr.color }}>{pr.label}</span>
+                </div>
+              </Link>
+            </div>
           )
         })}
         {demandas.length === 0 && (
