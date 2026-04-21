@@ -1,12 +1,14 @@
 "use client"
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
-import { useCallback } from "react"
+import { useCallback, useState, useTransition } from "react"
 import Link from "next/link"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
-import { ChevronLeft, ChevronRight } from "lucide-react"
+import { ChevronLeft, ChevronRight, Trash2, CheckCheck, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { toast } from "sonner"
+import { bulkUpdateStatus, bulkUpdatePrioridade, bulkDelete } from "@/lib/actions/tasks"
 import type { InferSelectModel } from "drizzle-orm"
 import type { demandas, projetos } from "@/lib/db/schema"
 
@@ -39,6 +41,8 @@ export function TasksTable({ demandas, projetos, page, totalPages, filters }: Ta
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
+  const [selected, setSelected] = useState<Set<number>>(new Set())
+  const [isPending, startTransition] = useTransition()
 
   const updateParam = useCallback(
     (key: string, value: string | undefined) => {
@@ -57,6 +61,56 @@ export function TasksTable({ demandas, projetos, page, totalPages, filters }: Ta
     router.push(`${pathname}?${params.toString()}`)
   }
 
+  const toggleAll = () => {
+    if (selected.size === demandas.length) {
+      setSelected(new Set())
+    } else {
+      setSelected(new Set(demandas.map((d) => d.id)))
+    }
+  }
+
+  const toggleOne = (id: number) => {
+    setSelected((prev) => {
+      const next = new Set(prev)
+      next.has(id) ? next.delete(id) : next.add(id)
+      return next
+    })
+  }
+
+  const handleBulkStatus = (status: string) => {
+    startTransition(async () => {
+      await bulkUpdateStatus([...selected], status)
+      setSelected(new Set())
+      toast.success(`${selected.size} demanda(s) atualizada(s)`)
+      router.refresh()
+    })
+  }
+
+  const handleBulkPrioridade = (prioridade: string) => {
+    startTransition(async () => {
+      await bulkUpdatePrioridade([...selected], prioridade)
+      setSelected(new Set())
+      toast.success(`${selected.size} demanda(s) atualizada(s)`)
+      router.refresh()
+    })
+  }
+
+  const handleBulkDelete = () => {
+    if (!confirm(`Excluir ${selected.size} demanda(s)?`)) return
+    startTransition(async () => {
+      await bulkDelete([...selected])
+      setSelected(new Set())
+      toast.success("Demandas excluídas")
+      router.refresh()
+    })
+  }
+
+  const selectStyle = {
+    background: "var(--color-bg-3)",
+    borderColor: "var(--color-line)",
+    color: "var(--color-fg-1)",
+  }
+
   return (
     <div className="space-y-3">
       {/* Filters */}
@@ -65,11 +119,7 @@ export function TasksTable({ demandas, projetos, page, totalPages, filters }: Ta
           value={filters.status ?? ""}
           onChange={(e) => updateParam("status", e.target.value || undefined)}
           className="h-7 text-xs rounded px-2 border"
-          style={{
-            background: "var(--color-bg-3)",
-            borderColor: "var(--color-line)",
-            color: "var(--color-fg-1)",
-          }}
+          style={selectStyle}
         >
           <option value="">Todos os status</option>
           {Object.entries(statusConfig).map(([k, v]) => (
@@ -80,11 +130,7 @@ export function TasksTable({ demandas, projetos, page, totalPages, filters }: Ta
           value={filters.prioridade ?? ""}
           onChange={(e) => updateParam("prioridade", e.target.value || undefined)}
           className="h-7 text-xs rounded px-2 border"
-          style={{
-            background: "var(--color-bg-3)",
-            borderColor: "var(--color-line)",
-            color: "var(--color-fg-1)",
-          }}
+          style={selectStyle}
         >
           <option value="">Todas as prioridades</option>
           {Object.entries(prioridadeConfig).map(([k, v]) => (
@@ -95,11 +141,7 @@ export function TasksTable({ demandas, projetos, page, totalPages, filters }: Ta
           value={filters.projeto ?? ""}
           onChange={(e) => updateParam("projeto", e.target.value || undefined)}
           className="h-7 text-xs rounded px-2 border"
-          style={{
-            background: "var(--color-bg-3)",
-            borderColor: "var(--color-line)",
-            color: "var(--color-fg-1)",
-          }}
+          style={selectStyle}
         >
           <option value="">Todos os projetos</option>
           {projetos.map((p) => (
@@ -123,6 +165,64 @@ export function TasksTable({ demandas, projetos, page, totalPages, filters }: Ta
         )}
       </div>
 
+      {/* Bulk actions bar */}
+      {selected.size > 0 && (
+        <div
+          className="flex items-center gap-2 px-3 py-2 rounded-[6px] border text-xs"
+          style={{ background: "var(--color-bg-2)", borderColor: "var(--color-accent-line, rgba(201,240,74,.34))" }}
+        >
+          {isPending && <Loader2 className="h-3 w-3 animate-spin" style={{ color: "var(--color-accent)" }} />}
+          <span style={{ color: "var(--color-accent)" }} className="font-medium">
+            {selected.size} selecionada{selected.size !== 1 ? "s" : ""}
+          </span>
+          <span style={{ color: "var(--color-line-2)" }}>·</span>
+          <select
+            className="h-6 text-xs rounded px-1.5 border"
+            style={selectStyle}
+            defaultValue=""
+            onChange={(e) => { if (e.target.value) handleBulkStatus(e.target.value) }}
+          >
+            <option value="" disabled>Mudar status</option>
+            {Object.entries(statusConfig).map(([k, v]) => (
+              <option key={k} value={k}>{v.label}</option>
+            ))}
+          </select>
+          <select
+            className="h-6 text-xs rounded px-1.5 border"
+            style={selectStyle}
+            defaultValue=""
+            onChange={(e) => { if (e.target.value) handleBulkPrioridade(e.target.value) }}
+          >
+            <option value="" disabled>Mudar prioridade</option>
+            {Object.entries(prioridadeConfig).map(([k, v]) => (
+              <option key={k} value={k}>{v.label}</option>
+            ))}
+          </select>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-6 text-xs gap-1 ml-auto"
+            style={{ color: "var(--color-ok)" }}
+            onClick={() => handleBulkStatus("concluida")}
+            disabled={isPending}
+          >
+            <CheckCheck className="h-3 w-3" />
+            Concluir
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-6 text-xs gap-1"
+            style={{ color: "var(--color-danger)" }}
+            onClick={handleBulkDelete}
+            disabled={isPending}
+          >
+            <Trash2 className="h-3 w-3" />
+            Excluir
+          </Button>
+        </div>
+      )}
+
       {/* Table (desktop) */}
       <div
         className="hidden md:block rounded-[10px] border overflow-hidden"
@@ -131,12 +231,16 @@ export function TasksTable({ demandas, projetos, page, totalPages, filters }: Ta
         <table className="w-full text-xs">
           <thead>
             <tr style={{ background: "var(--color-bg-1)", borderBottom: "1px solid var(--color-line)" }}>
+              <th className="px-3 py-2 w-8">
+                <input
+                  type="checkbox"
+                  checked={selected.size === demandas.length && demandas.length > 0}
+                  onChange={toggleAll}
+                  className="w-3.5 h-3.5 rounded accent-[var(--color-accent)] cursor-pointer"
+                />
+              </th>
               {["Título", "Status", "Prioridade", "Projeto", "Prazo"].map((h) => (
-                <th
-                  key={h}
-                  className="text-left px-3 py-2 font-medium"
-                  style={{ color: "var(--color-fg-3)" }}
-                >
+                <th key={h} className="text-left px-3 py-2 font-medium" style={{ color: "var(--color-fg-3)" }}>
                   {h}
                 </th>
               ))}
@@ -145,11 +249,7 @@ export function TasksTable({ demandas, projetos, page, totalPages, filters }: Ta
           <tbody>
             {demandas.length === 0 && (
               <tr>
-                <td
-                  colSpan={5}
-                  className="px-3 py-8 text-center"
-                  style={{ color: "var(--color-fg-3)" }}
-                >
+                <td colSpan={6} className="px-3 py-8 text-center" style={{ color: "var(--color-fg-3)" }}>
                   Nenhuma demanda encontrada
                 </td>
               </tr>
@@ -158,14 +258,29 @@ export function TasksTable({ demandas, projetos, page, totalPages, filters }: Ta
               const st = statusConfig[d.status as keyof typeof statusConfig] ?? statusConfig.pendente
               const pr = prioridadeConfig[d.prioridade as keyof typeof prioridadeConfig] ?? prioridadeConfig.media
               const projeto = projetos.find((p) => p.id === d.projetoId)
+              const isSelected = selected.has(d.id)
               return (
                 <tr
                   key={d.id}
-                  className="border-t hover:bg-[var(--color-bg-2)] transition-colors cursor-pointer"
-                  style={{ borderColor: "var(--color-line)" }}
-                  onClick={() => router.push(`/tasks/${d.id}`)}
+                  className="border-t transition-colors"
+                  style={{
+                    borderColor: "var(--color-line)",
+                    background: isSelected ? "var(--color-bg-2)" : undefined,
+                  }}
                 >
-                  <td className="px-3 py-2" style={{ color: "var(--color-fg-1)" }}>
+                  <td className="px-3 py-2" onClick={(e) => e.stopPropagation()}>
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      onChange={() => toggleOne(d.id)}
+                      className="w-3.5 h-3.5 rounded accent-[var(--color-accent)] cursor-pointer"
+                    />
+                  </td>
+                  <td
+                    className="px-3 py-2 cursor-pointer hover:text-[var(--color-fg)]"
+                    style={{ color: "var(--color-fg-1)" }}
+                    onClick={() => router.push(`/tasks/${d.id}`)}
+                  >
                     <span className="line-clamp-1">{d.titulo}</span>
                   </td>
                   <td className="px-3 py-2">
@@ -178,9 +293,7 @@ export function TasksTable({ demandas, projetos, page, totalPages, filters }: Ta
                     {projeto?.nome ?? "—"}
                   </td>
                   <td className="px-3 py-2" style={{ color: "var(--color-fg-3)" }}>
-                    {d.dataLimite
-                      ? format(new Date(d.dataLimite), "dd MMM", { locale: ptBR })
-                      : "—"}
+                    {d.dataLimite ? format(new Date(d.dataLimite), "dd MMM", { locale: ptBR }) : "—"}
                   </td>
                 </tr>
               )
@@ -221,25 +334,11 @@ export function TasksTable({ demandas, projetos, page, totalPages, filters }: Ta
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex items-center justify-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-7 w-7"
-            disabled={page <= 1}
-            onClick={() => setPage(page - 1)}
-          >
+          <Button variant="ghost" size="icon" className="h-7 w-7" disabled={page <= 1} onClick={() => setPage(page - 1)}>
             <ChevronLeft className="h-3.5 w-3.5" />
           </Button>
-          <span className="text-xs" style={{ color: "var(--color-fg-2)" }}>
-            {page} / {totalPages}
-          </span>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-7 w-7"
-            disabled={page >= totalPages}
-            onClick={() => setPage(page + 1)}
-          >
+          <span className="text-xs" style={{ color: "var(--color-fg-2)" }}>{page} / {totalPages}</span>
+          <Button variant="ghost" size="icon" className="h-7 w-7" disabled={page >= totalPages} onClick={() => setPage(page + 1)}>
             <ChevronRight className="h-3.5 w-3.5" />
           </Button>
         </div>

@@ -10,8 +10,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { LogOut, User, Moon, Sun } from "lucide-react"
+import { LogOut, User, Moon, Sun, Search } from "lucide-react"
 import { useTheme } from "next-themes"
+import { CommandPalette } from "@/components/features/command-palette"
 
 const pageTitles: Record<string, string> = {
   "/dashboard": "Dashboard",
@@ -35,9 +36,22 @@ export function AppHeader({ user }: AppHeaderProps) {
       className="flex items-center gap-3 px-4 md:px-6 h-11 border-b shrink-0"
       style={{ background: "var(--color-bg-1)", borderColor: "var(--color-line)" }}
     >
-      <h1 className="text-sm font-semibold flex-1" style={{ color: "var(--color-fg)" }}>
+      <h1 className="text-sm font-semibold" style={{ color: "var(--color-fg)" }}>
         {title}
       </h1>
+
+      {/* Search trigger */}
+      <button
+        className="hidden md:flex flex-1 mx-4 items-center gap-2 px-3 h-7 rounded text-xs border max-w-48 cursor-text"
+        style={{ background: "var(--color-bg-3)", borderColor: "var(--color-line)", color: "var(--color-fg-3)" }}
+        onClick={() => document.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true, bubbles: true }))}
+      >
+        <Search className="h-3 w-3 shrink-0" />
+        <span>Buscar…</span>
+        <kbd className="ml-auto text-[10px] px-1 rounded" style={{ background: "var(--color-bg-2)", border: "1px solid var(--color-line)" }}>⌘K</kbd>
+      </button>
+
+      <CommandPalette />
 
       {/* Theme toggle */}
       <Button

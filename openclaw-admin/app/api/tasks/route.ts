@@ -3,6 +3,8 @@ import { db } from "@/lib/db"
 import { demandas } from "@/lib/db/schema"
 import { NextResponse } from "next/server"
 import { z } from "zod"
+import { rateLimit } from "@/lib/rate-limit"
+import { headers } from "next/headers"
 
 const createSchema = z.object({
   titulo: z.string().min(1),
@@ -15,6 +17,11 @@ const createSchema = z.object({
 })
 
 export async function POST(req: Request) {
+  const hdrs = await headers()
+  const ip = hdrs.get("x-forwarded-for") ?? hdrs.get("x-real-ip") ?? "anonymous"
+  const rl = rateLimit(ip, 30)
+  if (!rl.success) return NextResponse.json({ error: "Too many requests" }, { status: 429 })
+
   const session = await auth()
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
