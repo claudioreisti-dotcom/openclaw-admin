@@ -13,23 +13,91 @@ O painel Alfred compartilha o banco Neon com o agent Python OpenClaw. Este docum
 
 **Regra de ouro:** Ambos os sistemas têm leitura/escrita. Nunca assumir que um campo é "só leitura" sem verificar no código do agent.
 
-## Schema do Banco
+## Schema do Banco (extraído em 2026-04-21)
 
-> Aguarda execução de `scripts/inspect_db.py`.
->
-> Quando o schema for extraído, documentar aqui:
-> - Quais tabelas o agent **cria** registos
-> - Quais tabelas o agent **lê** para tomar decisões
-> - Campos que o agent usa como **sinais** (ex: mudar `status` para X pode disparar ação no Telegram)
-> - Campos que o painel pode editar **com segurança**
-> - Campos que o painel **não deve editar** (usados como flags pelo agent)
+### `demandas` — entidade principal (44 linhas)
 
-## Campos de Alto Risco (a verificar)
+| Coluna | Tipo | Null | Observações |
+|---|---|---|---|
+| id | integer | NO | PK, auto-increment |
+| titulo | varchar(300) | NO | Editável pelo painel |
+| descricao | text | YES | Editável pelo painel |
+| projeto_id | integer | YES | FK → projetos.id |
+| status | varchar(50) | YES | Default 'pendente' — **⚠️ campo de sinal** |
+| prioridade | varchar(20) | YES | Default 'media' — Editável |
+| responsavel | varchar(100) | YES | Editável pelo painel |
+| data_limite | date | YES | Editável pelo painel |
+| data_conclusao | date | YES | Editável; agent pode setar ao concluir |
+| tags | ARRAY | YES | Array de texto — editável |
+| criado_em | timestamp | YES | Read-only |
+| atualizado_em | timestamp | YES | Atualizar em toda mutação |
 
-Antes de expor um campo para edição no painel, verificar se:
-- [ ] O agent usa este campo como condição de trigger
-- [ ] Mudar o valor pode disparar mensagem no Telegram
-- [ ] O campo tem semântica especial no fluxo do agent
+**Valores de status observados:** `pendente`, `concluida`, `em_andamento`
+
+### `projetos` — projetos (10 linhas)
+
+| Coluna | Tipo | Null | Observações |
+|---|---|---|---|
+| id | integer | NO | PK |
+| nome | varchar(200) | NO | Editável |
+| descricao | text | YES | Editável |
+| status | varchar(50) | YES | Default 'ativo' |
+| prioridade | varchar(20) | YES | Default 'media' |
+| criado_em | timestamp | YES | Read-only |
+| atualizado_em | timestamp | YES | Atualizar em toda mutação |
+
+### `notas` — notas (27 linhas)
+
+| Coluna | Tipo | Null | Observações |
+|---|---|---|---|
+| id | integer | NO | PK |
+| titulo | varchar(200) | YES | Opcional |
+| conteudo | text | YES | Corpo da nota |
+| demanda_id | integer | YES | FK → demandas.id (mutuamente exclusivo com projeto_id) |
+| projeto_id | integer | YES | FK → projetos.id |
+| criado_em | timestamp | YES | Read-only |
+
+### `agent_activities` — atividades do agent (10 linhas) ⚠️ READ-ONLY no painel
+
+| Coluna | Tipo | Null | Observações |
+|---|---|---|---|
+| id | integer | NO | PK |
+| agent | varchar(50) | NO | Nome do agent ('alfred', 'bugou', etc.) |
+| titulo | varchar(200) | NO | Descrição da atividade |
+| descricao | text | YES | Detalhe |
+| status | varchar(20) | NO | Default 'pendente' |
+| prioridade | varchar(10) | YES | Default 'media' |
+| iniciado_em | timestamp | YES | Timestamp de início |
+| concluido_em | timestamp | YES | Timestamp de conclusão |
+| criado_em | timestamp | YES | Read-only |
+| atualizado_em | timestamp | YES | Read-only |
+| metadata | jsonb | YES | Dados estruturados do agent |
+
+**O painel deve exibir esta tabela como read-only.** O agent grava aqui automaticamente.
+
+### `uso_tokens` — custo LLM (0 linhas) — read-only no painel
+
+| Coluna | Tipo | Observações |
+|---|---|---|
+| data | date | Data de uso |
+| sessao | varchar(100) | ID de sessão |
+| modelo | varchar(100) | Modelo usado |
+| tokens_entrada / tokens_saida / tokens_total | integer | Contagens |
+| custo_usd | numeric | Custo em USD |
+
+### `admin_users` — utilizadores do painel *(a criar — prefixo admin_)*
+
+Esta tabela **não existe no banco** e será criada pelo painel (única exceção permitida):
+- `id`, `email`, `password_hash`, `name`, `telegram_user_id` (FK opcional), `created_at`
+
+## Campos de Alto Risco ⚠️
+
+| Campo | Tabela | Risco | Ação |
+|---|---|---|---|
+| `status` | demandas | Agent pode ler para decidir próximas ações | Expor com cautela; não usar valores não documentados |
+| `data_conclusao` | demandas | Agent pode setar ao concluir via Telegram | Aceitar edição manual, mas usar optimistic locking |
+| `agent_activities.*` | agent_activities | Toda a tabela é escrita pelo agent | **Read-only no painel** |
+| `uso_tokens.*` | uso_tokens | Toda a tabela é escrita pelo agent | **Read-only no painel** |
 
 ## Sincronização
 

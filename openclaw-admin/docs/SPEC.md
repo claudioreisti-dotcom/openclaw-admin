@@ -136,18 +136,43 @@ Formulário com os campos principais da entidade 🔶. Validação Zod. Submit:
 
 ---
 
-## Entidades esperadas 🔶
+## Entidades (schema extraído em 2026-04-21)
 
-*A preencher com base no schema.txt. Template:*
+### `demandas` — entidade principal do painel
 
-### `<tabela_principal>`
-- Campos relevantes para CRUD: ...
-- Campos read-only: ...
-- Relacionamentos: ...
-- Enums: ...
+- **CRUD completo:** titulo, descricao, projeto_id, status, prioridade, responsavel, data_limite, data_conclusao, tags
+- **Read-only:** id, criado_em, atualizado_em (atualizado automaticamente em mutações)
+- **Relacionamentos:** N:1 com `projetos`; 1:N com `notas`
+- **Status válidos:** `pendente` · `em_andamento` · `concluida` · `cancelada`
+- **Prioridades válidas:** `baixa` · `media` · `alta` · `urgente`
+- **Tags:** array de strings livres
 
-### `<tabela_usuarios>`
-- ...
+### `projetos` — agrupador de demandas
 
-### `<tabela_conversas>` (se existir)
-- ...
+- **CRUD completo:** nome, descricao, status, prioridade
+- **Read-only:** id, criado_em, atualizado_em
+- **Status válidos:** `ativo` · `concluido` · `cancelado`
+- Usado como filtro na lista de demandas
+
+### `notas` — notas contextuais
+
+- **CRUD completo:** titulo (opcional), conteudo, demanda_id ou projeto_id
+- Exibidas na página de detalhe da demanda ou projeto
+- Uma nota pertence a **uma** demanda **ou** um projeto (não ambos)
+
+### `agent_activities` — atividades do agent (read-only no painel)
+
+- Exibidas numa página separada `/activities` como log histórico
+- Filtros: agent, status, prioridade, intervalo de datas
+- **Sem edição** — o agent escreve aqui automaticamente
+
+### `uso_tokens` — custo LLM (read-only no painel)
+
+- Exibido em `/settings` como painel de consumo de IA
+- Agrupado por dia e modelo
+
+### `admin_users` — utilizadores do painel (criada pelo painel)
+
+- **Campos:** id, email, password_hash, name, telegram_user_id, created_at
+- Gerida exclusivamente pelo painel via script `pnpm admin:create`
+- Prefixo `admin_` para isolar do agent
