@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
-import { ArrowLeft, Save, Trash2, Plus, Loader2 } from "lucide-react"
+import { ArrowLeft, Save, Trash2, Plus, Loader2, CheckCircle2, RotateCcw } from "lucide-react"
 import Link from "next/link"
 import type { InferSelectModel } from "drizzle-orm"
 import type { demandas, projetos, notas } from "@/lib/db/schema"
@@ -20,6 +20,28 @@ import { apiUrl } from "@/lib/api"
 type Demanda = InferSelectModel<typeof demandas>
 type Projeto = Pick<InferSelectModel<typeof projetos>, "id" | "nome">
 type Nota = InferSelectModel<typeof notas>
+
+const statusConfig: Record<string, { label: string; color: string; bg: string }> = {
+  aguardando:   { label: "Aguardando",   color: "#ffb547", bg: "rgba(255,181,71,.12)"  },
+  backlog:      { label: "Backlog",      color: "#5f6875", bg: "rgba(95,104,117,.10)"  },
+  em_andamento: { label: "Em andamento", color: "#7ab8ff", bg: "rgba(122,184,255,.12)" },
+  concluida:    { label: "Concluída",    color: "#4ade80", bg: "rgba(74,222,128,.12)"  },
+  concluido:    { label: "Concluída",    color: "#4ade80", bg: "rgba(74,222,128,.12)"  },
+  cancelada:    { label: "Cancelada",    color: "#5f6875", bg: "rgba(95,104,117,.10)"  },
+}
+
+function StatusPill({ status }: { status: string | null }) {
+  if (!status) return null
+  const st = statusConfig[status] ?? { label: status, color: "#5f6875", bg: "rgba(95,104,117,.10)" }
+  return (
+    <span
+      className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium whitespace-nowrap"
+      style={{ color: st.color, background: st.bg }}
+    >
+      {st.label}
+    </span>
+  )
+}
 
 const schema = z.object({
   titulo: z.string().min(1),
@@ -41,11 +63,76 @@ interface TaskDetailProps {
 export function TaskDetail({ demanda, projetos, notas }: TaskDetailProps) {
   const router = useRouter()
   const [saving, setSaving] = useState(false)
+  const [completing, setCompleting] = useState(false)
+  const [currentStatus, setCurrentStatus] = useState(demanda.status ?? "aguardando")
 
   const [notasList, setNotasList] = useState<Nota[]>(notas)
   const [addingNota, setAddingNota] = useState(false)
   const [savingNota, setSavingNota] = useState(false)
   const [notaForm, setNotaForm] = useState({ titulo: "", conteudo: "" })
+
+  const isDone = currentStatus === "concluida" || currentStatus === "concluido"
+  const isCancelled = currentStatus === "cancelada"
+
+  const { register, handleSubmit, setValue } = useForm<FormData>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      titulo:      demanda.titulo,
+      descricao:   demanda.descricao ?? "",
+      status:      demanda.status ?? "aguardando",
+      prioridade:  demanda.prioridade ?? "media",
+      responsavel: demanda.responsavel ?? "",
+      projeto_id:  demanda.projetoId ? String(demanda.projetoId) : "",
+      data_limite: demanda.dataLimite ?? "",
+    },
+  })
+
+  async function handleQuickStatus(newStatus: string) {
+    setCompleting(true)
+    const res = await fetch(apiUrl(`/api/tasks/${demanda.id}`), {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: newStatus }),
+    })
+    setCompleting(false)
+    if (res.ok) {
+      setCurrentStatus(newStatus)
+      setValue("status", newStatus)
+      const msg = newStatus === "concluida" ? "Demanda concluída!" : "Demanda reaberta"
+      toast.success(msg)
+      router.refresh()
+    } else {
+      toast.error("Erro ao atualizar status")
+    }
+  }
+
+  async function onSubmit(data: FormData) {
+    setSaving(true)
+    const res = await fetch(apiUrl(`/api/tasks/${demanda.id}`), {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    })
+    setSaving(false)
+    if (res.ok) {
+      setCurrentStatus(data.status)
+      toast.success("Demanda atualizada")
+      router.refresh()
+    } else {
+      toast.error("Erro ao salvar")
+    }
+  }
+
+  async function onDelete() {
+    if (!confirm("Excluir esta demanda?")) return
+    const res = await fetch(apiUrl(`/api/tasks/${demanda.id}`), { method: "DELETE" })
+    if (res.ok) {
+      toast.success("Demanda excluída")
+      router.push("/tasks")
+    } else {
+      toast.error("Erro ao excluir")
+    }
+  }
 
   async function handleAddNota(e: React.FormEvent) {
     e.preventDefault()
@@ -68,46 +155,6 @@ export function TaskDetail({ demanda, projetos, notas }: TaskDetailProps) {
     }
   }
 
-  const { register, handleSubmit } = useForm<FormData>({
-    resolver: zodResolver(schema),
-    defaultValues: {
-      titulo: demanda.titulo,
-      descricao: demanda.descricao ?? "",
-      status: demanda.status ?? "pendente",
-      prioridade: demanda.prioridade ?? "media",
-      responsavel: demanda.responsavel ?? "",
-      projeto_id: demanda.projetoId ? String(demanda.projetoId) : "",
-      data_limite: demanda.dataLimite ?? "",
-    },
-  })
-
-  async function onSubmit(data: FormData) {
-    setSaving(true)
-    const res = await fetch(apiUrl(`/api/tasks/${demanda.id}`), {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    })
-    setSaving(false)
-    if (res.ok) {
-      toast.success("Demanda atualizada")
-      router.refresh()
-    } else {
-      toast.error("Erro ao salvar")
-    }
-  }
-
-  async function onDelete() {
-    if (!confirm("Excluir esta demanda?")) return
-    const res = await fetch(apiUrl(`/api/tasks/${demanda.id}`), { method: "DELETE" })
-    if (res.ok) {
-      toast.success("Demanda excluída")
-      router.push("/tasks")
-    } else {
-      toast.error("Erro ao excluir")
-    }
-  }
-
   const fieldStyle = {
     background: "var(--color-bg-3)",
     borderColor: "var(--color-line)",
@@ -117,20 +164,23 @@ export function TaskDetail({ demanda, projetos, notas }: TaskDetailProps) {
   const labelStyle = { color: "var(--color-fg-2)", fontSize: 11 }
 
   return (
-    <div className="max-w-2xl space-y-6">
-      <div className="flex items-center gap-3">
+    <div className="max-w-2xl space-y-5">
+      {/* Header */}
+      <div className="flex items-start gap-3">
         <Link href="/tasks">
-          <Button variant="ghost" size="icon" className="h-7 w-7" style={{ color: "var(--color-fg-3)" }}>
+          <Button variant="ghost" size="icon" className="h-7 w-7 mt-0.5" style={{ color: "var(--color-fg-3)" }}>
             <ArrowLeft className="h-3.5 w-3.5" />
           </Button>
         </Link>
-        <h2 className="text-sm font-semibold flex-1 truncate" style={{ color: "var(--color-fg)" }}>
-          {demanda.titulo}
-        </h2>
+        <div className="flex-1 min-w-0 space-y-1.5">
+          <h2 className="text-sm font-semibold leading-snug" style={{ color: "var(--color-fg)" }}>
+            {demanda.titulo}
+          </h2>
+          <StatusPill status={currentStatus} />
+        </div>
         <Button
-          variant="ghost"
-          size="icon"
-          className="h-7 w-7"
+          variant="ghost" size="icon"
+          className="h-7 w-7 mt-0.5 shrink-0"
           style={{ color: "var(--color-danger)" }}
           onClick={onDelete}
         >
@@ -138,6 +188,71 @@ export function TaskDetail({ demanda, projetos, notas }: TaskDetailProps) {
         </Button>
       </div>
 
+      {/* Quick action bar */}
+      <div
+        className="flex items-center gap-2 px-4 py-3 rounded-[10px] border"
+        style={{ background: "var(--color-bg-1)", borderColor: "var(--color-line)" }}
+      >
+        {!isDone && !isCancelled ? (
+          <>
+            <Button
+              type="button"
+              size="sm"
+              className="h-8 text-xs gap-2"
+              disabled={completing}
+              onClick={() => handleQuickStatus("concluida")}
+              style={{
+                background: "rgba(74,222,128,.15)",
+                color: "#4ade80",
+                border: "1px solid rgba(74,222,128,.25)",
+                flex: 1,
+              }}
+            >
+              {completing
+                ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                : <CheckCircle2 className="h-3.5 w-3.5" />}
+              Concluir demanda
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-8 text-xs gap-2"
+              disabled={completing}
+              onClick={() => handleQuickStatus("em_andamento")}
+              style={{ color: "#7ab8ff" }}
+            >
+              Em andamento
+            </Button>
+          </>
+        ) : (
+          <>
+            <div
+              className="flex items-center gap-1.5 text-xs flex-1"
+              style={{ color: isDone ? "#4ade80" : "#5f6875" }}
+            >
+              <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
+              {isDone ? "Demanda concluída" : "Demanda cancelada"}
+            </div>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-8 text-xs gap-1.5"
+              disabled={completing}
+              onClick={() => handleQuickStatus("aguardando")}
+              style={{ color: "var(--color-fg-3)" }}
+            >
+              {completing
+                ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                : <RotateCcw className="h-3.5 w-3.5" />}
+              Reabrir
+            </Button>
+          </>
+        )}
+      </div>
+
+      {/* Edit form */}
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div className="space-y-1.5">
           <Label style={labelStyle}>Título</Label>
@@ -156,7 +271,8 @@ export function TaskDetail({ demanda, projetos, notas }: TaskDetailProps) {
           <div className="space-y-1.5">
             <Label style={labelStyle}>Status</Label>
             <select {...register("status")} className="w-full h-8 rounded px-2 text-xs border" style={fieldStyle}>
-              <option value="pendente">Pendente</option>
+              <option value="aguardando">Aguardando</option>
+              <option value="backlog">Backlog</option>
               <option value="em_andamento">Em andamento</option>
               <option value="concluida">Concluída</option>
               <option value="cancelada">Cancelada</option>
@@ -198,11 +314,12 @@ export function TaskDetail({ demanda, projetos, notas }: TaskDetailProps) {
           disabled={saving}
           style={{ background: "var(--color-accent)", color: "var(--color-accent-fg)", border: "none" }}
         >
-          <Save className="h-3.5 w-3.5" />
+          {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
           {saving ? "Salvando…" : "Salvar alterações"}
         </Button>
       </form>
 
+      {/* Notes */}
       <div
         className="rounded-[10px] border"
         style={{ background: "var(--color-bg-1)", borderColor: "var(--color-line)" }}
@@ -212,8 +329,7 @@ export function TaskDetail({ demanda, projetos, notas }: TaskDetailProps) {
             Notas {notasList.length > 0 && `(${notasList.length})`}
           </span>
           <Button
-            variant="ghost"
-            size="sm"
+            variant="ghost" size="sm"
             className="h-6 text-xs gap-1"
             style={{ color: "var(--color-accent)" }}
             onClick={() => setAddingNota((v) => !v)}
@@ -243,8 +359,7 @@ export function TaskDetail({ demanda, projetos, notas }: TaskDetailProps) {
             />
             <div className="flex gap-2">
               <Button
-                type="submit"
-                size="sm"
+                type="submit" size="sm"
                 className="h-6 text-xs gap-1"
                 disabled={savingNota}
                 style={{ background: "var(--color-accent)", color: "var(--color-accent-fg)", border: "none" }}
@@ -253,9 +368,7 @@ export function TaskDetail({ demanda, projetos, notas }: TaskDetailProps) {
                 Salvar
               </Button>
               <Button
-                type="button"
-                variant="ghost"
-                size="sm"
+                type="button" variant="ghost" size="sm"
                 className="h-6 text-xs"
                 style={{ color: "var(--color-fg-3)" }}
                 onClick={() => { setAddingNota(false); setNotaForm({ titulo: "", conteudo: "" }) }}
