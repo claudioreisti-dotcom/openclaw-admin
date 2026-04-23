@@ -1,5 +1,6 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { signOut } from "next-auth/react"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -29,6 +30,8 @@ interface AppHeaderProps {
 export function AppHeader({ user }: AppHeaderProps) {
   const pathname = usePathname()
   const { theme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
   const title = Object.entries(pageTitles).find(([k]) => pathname.startsWith(k))?.[1] ?? "Alfred"
 
   return (
@@ -60,8 +63,13 @@ export function AppHeader({ user }: AppHeaderProps) {
         className="h-7 w-7"
         onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
         style={{ color: "var(--color-fg-2)" }}
+        suppressHydrationWarning
       >
-        {theme === "dark" ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
+        {mounted
+          ? theme === "dark"
+            ? <Sun className="h-3.5 w-3.5" />
+            : <Moon className="h-3.5 w-3.5" />
+          : <Moon className="h-3.5 w-3.5" />}
       </Button>
 
       {/* User menu */}

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import {
   ComposedChart, Area, Line, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -173,6 +173,8 @@ export function DashboardV1({
   atividades: Atividade[]
 }) {
   const [timeFilter, setTimeFilter] = useState(1)
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
 
   const now = new Date()
   const dayName = DAYS_PT[now.getDay()] ?? ""
@@ -238,7 +240,7 @@ export function DashboardV1({
         {/* Line chart */}
         <div style={{
           background: "var(--color-bg-1)", border: "1px solid var(--color-line)",
-          borderRadius: 10, padding: 12,
+          borderRadius: 10, padding: 12, minHeight: 220,
         }}>
           <div style={{ display: "flex", alignItems: "baseline", gap: 10, flexWrap: "wrap", marginBottom: 4 }}>
             <span style={{ fontSize: 12, fontWeight: 600, color: "var(--color-fg)" }}>Criadas vs. concluídas</span>
@@ -253,7 +255,7 @@ export function DashboardV1({
               concluídas
             </span>
           </div>
-          <ResponsiveContainer width="100%" height={150}>
+          {mounted && <ResponsiveContainer width="100%" height={150}>
             <ComposedChart data={trend} margin={{ left: -16, right: 8, top: 4, bottom: 0 }}>
               <defs>
                 <linearGradient id="gradCriadas" x1="0" y1="0" x2="0" y2="1">
@@ -284,7 +286,7 @@ export function DashboardV1({
                 dot={false} activeDot={{ r: 3, fill: "#4ade80", strokeWidth: 0 }}
               />
             </ComposedChart>
-          </ResponsiveContainer>
+          </ResponsiveContainer>}
         </div>
 
         {/* Donut chart */}
@@ -300,7 +302,7 @@ export function DashboardV1({
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 4 }}>
             <div style={{ width: 120, height: 120, flexShrink: 0 }}>
-              <ResponsiveContainer width="100%" height="100%">
+              {mounted && <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
                     data={enrichedStatus} dataKey="total" nameKey="label"
@@ -313,7 +315,7 @@ export function DashboardV1({
                   </Pie>
                   <Tooltip contentStyle={tooltipStyle.contentStyle} itemStyle={tooltipStyle.itemStyle}/>
                 </PieChart>
-              </ResponsiveContainer>
+              </ResponsiveContainer>}
             </div>
             <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 4, minWidth: 0 }}>
               {enrichedStatus.map(s => (
