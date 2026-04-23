@@ -8,7 +8,11 @@ export default function Loading() {
           <Skeleton key={i} className="h-24 rounded-[10px]" style={{ background: "var(--color-bg-2)" }} />
         ))}
       </div>
-      <Skeleton className="h-48 rounded-[10px]" style={{ background: "var(--color-bg-2)" }} />
+      <div className="grid grid-cols-1 md:grid-cols-[1.5fr_1fr] gap-3">
+        <Skeleton className="h-52 rounded-[10px]" style={{ background: "var(--color-bg-2)" }} />
+        <Skeleton className="h-52 rounded-[10px]" style={{ background: "var(--color-bg-2)" }} />
+      </div>
+      <Skeleton className="h-64 rounded-[10px]" style={{ background: "var(--color-bg-2)" }} />
     </div>
   )
 }
