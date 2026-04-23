@@ -107,17 +107,22 @@ function PriorityBadge({ priority }: { priority: string | null }) {
 }
 
 function Stat({
-  label, value, sub, delta, icon: Ic, accent,
+  label, value, sub, delta, icon: Ic, accent, href,
 }: {
   label: string; value: string | number; sub?: string
-  delta?: number; icon?: React.ElementType; accent?: string
+  delta?: number; icon?: React.ElementType; accent?: string; href?: string
 }) {
-  return (
+  const inner = (
     <div style={{
       padding: "10px 12px", background: "var(--color-bg-1)",
       border: "1px solid var(--color-line)", borderRadius: 8,
       position: "relative", overflow: "hidden",
-    }}>
+      cursor: href ? "pointer" : "default",
+      transition: href ? "border-color 0.15s, background 0.15s" : undefined,
+    }}
+      onMouseEnter={href ? (e) => { (e.currentTarget as HTMLDivElement).style.borderColor = "var(--color-line-2)" } : undefined}
+      onMouseLeave={href ? (e) => { (e.currentTarget as HTMLDivElement).style.borderColor = "var(--color-line)" } : undefined}
+    >
       {accent && (
         <span style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 2, background: accent }}/>
       )}
@@ -145,6 +150,8 @@ function Stat({
       {sub && <div style={{ fontSize: 10.5, color: "var(--color-fg-3)", marginTop: 2 }}>{sub}</div>}
     </div>
   )
+  if (href) return <Link href={href} style={{ textDecoration: "none", display: "block" }}>{inner}</Link>
+  return inner
 }
 
 const tooltipStyle = {
@@ -228,10 +235,10 @@ export function DashboardV1({
 
       {/* ── KPI row ── */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
-        <Stat label="Ativas"        value={stats.ativas}           sub="demandas abertas"  icon={List}          accent="var(--color-accent)"/>
-        <Stat label="Concluídas 7d" value={stats.concluidasSemana} sub="última semana"     icon={CheckCircle2}  accent="var(--color-ok)"/>
-        <Stat label="Atrasadas"     value={stats.atrasadas}        sub="exigem atenção"    icon={AlertTriangle} accent="var(--color-danger)"/>
-        <Stat label="Projetos"      value={stats.projetos}         sub="workspaces ativos" icon={FolderOpen}    accent="var(--color-cyan)"/>
+        <Stat label="Ativas"        value={stats.ativas}           sub="demandas abertas"  icon={List}          accent="var(--color-accent)"  href="/tasks?filter=ativas"/>
+        <Stat label="Concluídas 7d" value={stats.concluidasSemana} sub="última semana"     icon={CheckCircle2}  accent="var(--color-ok)"      href="/tasks?status=concluida"/>
+        <Stat label="Atrasadas"     value={stats.atrasadas}        sub="exigem atenção"    icon={AlertTriangle} accent="var(--color-danger)"   href="/tasks?filter=atrasadas"/>
+        <Stat label="Projetos"      value={stats.projetos}         sub="workspaces ativos" icon={FolderOpen}    accent="var(--color-cyan)"    href="/projects"/>
       </div>
 
       {/* ── Charts row ── */}
@@ -302,8 +309,8 @@ export function DashboardV1({
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 4 }}>
             <div style={{ width: 120, height: 120, flexShrink: 0 }}>
-              {mounted && <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
+              {mounted && (
+                <PieChart width={120} height={120}>
                   <Pie
                     data={enrichedStatus} dataKey="total" nameKey="label"
                     cx="50%" cy="50%" innerRadius={32} outerRadius={52}
@@ -315,7 +322,7 @@ export function DashboardV1({
                   </Pie>
                   <Tooltip contentStyle={tooltipStyle.contentStyle} itemStyle={tooltipStyle.itemStyle}/>
                 </PieChart>
-              </ResponsiveContainer>}
+              )}
             </div>
             <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 4, minWidth: 0 }}>
               {enrichedStatus.map(s => (

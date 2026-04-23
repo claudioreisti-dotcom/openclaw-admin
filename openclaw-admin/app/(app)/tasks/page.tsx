@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import { db } from "@/lib/db"
 import { demandas, projetos } from "@/lib/db/schema"
-import { eq, ilike, or, desc, count, and, inArray } from "drizzle-orm"
+import { eq, ilike, or, desc, count, and, inArray, isNotNull, sql } from "drizzle-orm"
 import { TasksTable } from "@/components/features/tasks-table"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
@@ -16,6 +16,7 @@ interface PageProps {
     prioridade?: string
     projeto?: string
     q?: string
+    filter?: string
   }>
 }
 
@@ -28,9 +29,19 @@ export default async function TasksPage({ searchParams }: PageProps) {
 
   // Build where conditions
   const conditions = []
+
+  if (params.filter === "ativas") {
+    conditions.push(sql`status NOT IN ('concluida', 'concluido', 'cancelada', 'cancelado')`)
+  } else if (params.filter === "atrasadas") {
+    const today = new Date()
+    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`
+    conditions.push(isNotNull(demandas.dataLimite))
+    conditions.push(sql`data_limite < ${todayStr}::date`)
+    conditions.push(sql`status NOT IN ('concluida', 'concluido', 'cancelada', 'cancelado')`)
+  }
+
   if (params.status) {
     const statuses = params.status.split(",").filter(Boolean)
-    // expand concluida → concluida + concluido (alias do bot)
     const expanded = statuses.flatMap((s) => s === "concluida" ? ["concluida", "concluido"] : [s])
     conditions.push(expanded.length === 1 ? eq(demandas.status, expanded[0]!) : inArray(demandas.status, expanded))
   }

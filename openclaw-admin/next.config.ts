@@ -37,11 +37,9 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   output: "standalone",
   basePath: process.env.NEXT_PUBLIC_BASE_PATH ?? "",
+  outputFileTracingRoot: process.cwd(),
   images: {
     remotePatterns: [],
-  },
-  turbopack: {
-    root: __dirname,
   },
   async headers() {
     return [
